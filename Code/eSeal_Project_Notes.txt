@@ -1,0 +1,41 @@
+2021-05-24
+
+Ben Silas first meeting
+
+SCHEDULE
+May 24 - August 13, 2021
+
+PROJECTS
+
+•	Perform exploratory data analysis of long-term population trends for Elephant Seals and Harbor Seals at Point Reyes National Seashore. Initial data analysis will be basic population trends, but as time and interest allows, student may be trained in Bayesian generalized linear mixed effects models and Multivariate Autoregressive State-Space Modeling. Data sets are 20-40 years long in various locations and consist of 1000s of data points. (Approximately 140 hours).
+
+
+•	Perform background research into the feasibility of developing a system to use remote sensing imagery and artificial intelligence to automatically classify elephant seals, harbor seals and Tule elk from satellite images. Student will develop a scope of work (study plan) including feasibility, recommended processes, data sources, costs, time, and software for such a project to be implemented in the future. (Approximately 60 hours).
+
+
+
+WEEK 1:
+
+1. Get github working
+2. ESEAL
+  A. Read the EDA guide and "interview with the dataset"
+  B. EDA with the elephant seal dataset
+    i. make some exploratory plots
+    ii. Think about age classes, sex, location
+
+
+3. REMOTE SENSING
+  A. Read example paper
+
+
+
+
+
+
+
+
+
+
+WEEK 2
+
+
