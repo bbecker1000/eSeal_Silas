@@ -15,17 +15,26 @@ PROJECTS
 
 
 WEEK 1:
+Preliminaries: 
+      Revisit scope of internship.
+      Setup with R?
+      GitHub?  Username?  silas = pancakereport
+      Suggestions on how we work?
+      
 
 1. Get github working
 2. ESEAL
-  A. Read the EDA guide and "interview with the dataset"
-  B. EDA with the elephant seal dataset
+  A. Ben to send some websites and references on elephant seals
+  B. Read the EDA guide and "interview with the dataset"
+  C. EDA with the elephant seal dataset
     i. make some exploratory plots
     ii. Think about age classes, sex, location
 
 
 3. REMOTE SENSING
   A. Read example paper
+  B. see what is available in terns of satellite imager for California Coast
+  C. What other methods and examples are out there?
 
 
 
