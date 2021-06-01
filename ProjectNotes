@@ -3,3 +3,12 @@ Next steps for eSeal Data Analysis
 1. Plot Data through time for each age class and for each site.  ALSO plot total for all sites.
 1. For COWS, use the largest count of the year and correct for count (date adjusted) using the data in appendix of Condit et al 2021.
 1. For all other age classes, just use largest count of year.
+
+## New 2021-06/01
+
+1. EPUP should be grouped with PUP.  
+1. please make the plots as we discussed, but we will likely only do statistical analysis on:
+  - COWS
+  - PUPS combined with WEANERS on the same day for a maximum annual count.
+1. Note that YEAR is tricky since the surveys often start in december of the previous year and continue through the winter of the current year.  
+1. So surveys from December should be included with JAN, FEB, MARCH, APRIL, etc. of the current year.
