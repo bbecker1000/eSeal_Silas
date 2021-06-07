@@ -1,3 +1,7 @@
+# Notes about the data:
+# Feb/March 1983 Access was restricted because road was washed out due to  El Nino storms)
+# Did not include partial surveys completed during the 2018/2019 government shutdown
+
 library("readxl")
 library(dplyr)
 
@@ -118,25 +122,25 @@ SBcows_max_estimate <- SBcows %>% group_by(season) %>% slice(which.max(estimate)
 # combine these tables to get yearly estimates for total
 # use seasons 0 to 14 from PRcows as total estimate
 
-cow_estimate_total = PRcows_max$estimate[1:15]
+cow_estimate_total = PRcows_max_estimate$estimate[1:15]
 for (x in 16:39) {
-  pr <- PRcows_max$estimate[PRcows_max$season == x]
-  sb <- SBcows_max$estimate[SBcows_max$season == x]
-  db <- DBcows_max$estimate[DBcows_max$season == x]
+  pr <- PRcows_max_estimate$estimate[PRcows_max_estimate$season == x]
+  sb <- SBcows_max_estimate$estimate[SBcows_max_estimate$season == x]
+  db <- DBcows_max_estimate$estimate[DBcows_max_estimate$season == x]
   cow_estimate_total <- c(cow_estimate_total, pr + sb + db)
 }
 
 # I did this first and realized that on the github Ben said to calculate the estimate using the max count for the season so here's that
+# missing estimates for seasons 0, 1, and 13
+PRcows_max_count <- PRcows %>% group_by(season) %>% slice(which.max(Count))
+# missing estimates for seasons 14, 17, 18, 20, 21, 22, 24, 25, 26, 27, 29, 30, 32, 33, 34, 35, 37, 38 (starts at season 14)
+DBcows_max_count <- DBcows %>% group_by(season) %>% slice(which.max(Count))
+# missing estimates for seasons 14, 15, 16, 17, 19, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 33, 35, 36, 37, 38
+SBcows_max_count <- SBcows %>% group_by(season) %>% slice(which.max(Count))
 
+# because there are so many missing values for this I didn't calculate season totals for these
+# i haven't really dug into the tables i created yet, this is just the code to get there
 
-
-
- 
 # need to go back and look at the dates for these max estimates to make sure they seem reasonable for peak dates
+# and determine if there's a better strategy for calculating season estimates
 
-# repeat process for other age classes but without the use of the multiplier estimate
-
-
-# Notes about the data:
-# Feb/March 1983 Access was restricted because road was washed out due to  El Nino storms)
-# Did not include partial surveys completed during the 2018/2019 government shutdown
