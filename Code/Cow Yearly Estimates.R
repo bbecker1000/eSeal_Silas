@@ -64,15 +64,12 @@ largest_count_by_location <- function(table) {
 # had problems with function above so here is the code for grabbing each location and add the month-day date for each season
 PRcows <- subset(cows, Location == "PR Headlands")
 PRcows$month_day <- format(PRcows$Date, format="%m-%d")
-#PRcows_max <- PRcows %>% group_by(season) %>% slice(which.max(Count))
 
 DBcows <- subset(cows, Location == "Drakes Beach")
 DBcows$month_day <- format(DBcows$Date, format="%m-%d")
-#DBcows_max <- DBcows %>% group_by(season) %>% slice(which.max(Count))
 
 SBcows <- subset(cows, Location == "South Beach")
 SBcows$month_day <- format(SBcows$Date, format="%m-%d")
-#SBcows_max <- SBcows %>% group_by(season) %>% slice(which.max(Count))
 
 # recreate the multiplier table from Condit et al. (Table A3)
 Date <- format(seq(as.Date("1981-01-11"), as.Date("1981-02-08"), by="days"), format="%m-%d")
