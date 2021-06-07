@@ -119,8 +119,8 @@ SBcows_max_estimate <- SBcows %>% group_by(season) %>% slice(which.max(estimate)
 # combine these tables to get yearly estimates for total
 # use seasons 0 to 14 from PRcows as total estimate
 
-cow_estimate_total = PRcows_max_estimate$estimate[1:15]
-for (x in 16:39) {
+cow_estimate_total = PRcows_max_estimate$estimate[1:15] #0 index so grabs seasons 0 to 14, need the loop to start at season 15
+for (x in 15:39) {
   pr <- PRcows_max_estimate$estimate[PRcows_max_estimate$season == x]
   sb <- SBcows_max_estimate$estimate[SBcows_max_estimate$season == x]
   db <- DBcows_max_estimate$estimate[DBcows_max_estimate$season == x]
@@ -135,8 +135,31 @@ DBcows_max_count <- DBcows %>% group_by(season) %>% slice(which.max(Count))
 # missing estimates for seasons 14, 15, 16, 17, 19, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 33, 35, 36, 37, 38
 SBcows_max_count <- SBcows %>% group_by(season) %>% slice(which.max(Count))
 
-# because there are so many missing values for this I didn't calculate season totals for these
+# total max count for all locations
+cow_max_total <- PRcows_max_count$Count[1:15]
+for (x in 15:39) {
+  pr <- PRcows_max_count$Count[PRcows_max_count$season == x]
+  sb <- SBcows_max_count$Count[SBcows_max_count$season == x]
+  db <- DBcows_max_count$Count[DBcows_max_count$season == x]
+  cow_max_total <- c(cow_max_total, pr + sb + db)
+}
+
 # i haven't really dug into the tables i created yet, this is just the code to get there
+# here are some plots
+
+# plot total estimates and max counts for each season
+plot(0:39, cow_estimate_total, type='l', main="Estimated Cow Count from 1981 to 2020\nAll Locations", xlab="Season", ylab='Estimated Count')
+plot(0:39, cow_max_total, type='l', main="Maximum Cow Count from 1981 to 2020\nAll Locations", xlab="Season", ylab='Maximum Count')
+
+# can also plot for each location
+plot(0:39, PRcows_max_estimate$estimate, type='l', main="Estimated Cow Count from 1981 to 2020\n PR Headlands", xlab="Season", ylab='Estimated Count')
+plot(14:39, DBcows_max_estimate$estimate, type='l', main="Estimated Cow Count from 1981 to 2020\n Drakes Beach", xlab="Season", ylab='Estimated Count')
+plot(14:39, SBcows_max_estimate$estimate, type='l', main="Estimated Cow Count from 1981 to 2020\n South Beach", xlab="Season", ylab='Estimated Count')
+
+plot(0:39, PRcows_max_count$Count, type='l', main="Maximum Cow Count from 1981 to 2020\nPR Headlands", xlab="Season", ylab='Maximum Count')
+plot(14:39, DBcows_max_count$Count, type='l', main="Maximum Cow Count from 1981 to 2020\nDrakes Beach", xlab="Season", ylab='Maximum Count')
+plot(14:39, SBcows_max_count$Count, type='l', main="Maximum Cow Count from 1981 to 2020\nSouth Beach", xlab="Season", ylab='Maximum Count')
+
 
 # need to go back and look at the dates for these max estimates to make sure they seem reasonable for peak dates
 # and determine if there's a better strategy for calculating season estimates
