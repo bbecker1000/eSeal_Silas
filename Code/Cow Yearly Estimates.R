@@ -39,13 +39,22 @@ unique(seals_date$mon)
 #    the condition has length > 1 and only the first element will be used
 
 get_season <- function(date) {
-  if (date$mon > 9) {season <- date$year - 80}
+  if (date$mon > 6) {season <- date$year - 80}
   else season <- date$year - 81 
   return(season)
 }
 
+# function that does get_season on every item in a list
+get_season_all <- function(lst) {
+  vec <- vector("list", length(lst))
+  for (i in 1:length(lst)) {
+    vec[[i]] <- get_season(lst[[i]])
+  }
+  return(vec)
+}
+
 # now that we have the seasons we can add them to the tables
-seals$season <- get_season(seals_date)
+seals$season <- get_season_all(seals_date)
 
 # subset to grab only cows
 cows <- subset(seals, Age == "COW")
@@ -153,12 +162,12 @@ plot(0:39, cow_max_total, type='l', main="Maximum Cow Count from 1981 to 2020\nA
 
 # can also plot for each location
 plot(0:39, PRcows_max_estimate$estimate, type='l', main="Estimated Cow Count from 1981 to 2020\n PR Headlands", xlab="Season", ylab='Estimated Count')
-plot(14:39, DBcows_max_estimate$estimate, type='l', main="Estimated Cow Count from 1981 to 2020\n Drakes Beach", xlab="Season", ylab='Estimated Count')
-plot(14:39, SBcows_max_estimate$estimate, type='l', main="Estimated Cow Count from 1981 to 2020\n South Beach", xlab="Season", ylab='Estimated Count')
+plot(14:39, DBcows_max_estimate$estimate, type='l', main="Estimated Cow Count from 1995 to 2020\n Drakes Beach", xlab="Season", ylab='Estimated Count')
+plot(14:39, SBcows_max_estimate$estimate, type='l', main="Estimated Cow Count from 1995 to 2020\n South Beach", xlab="Season", ylab='Estimated Count')
 
 plot(0:39, PRcows_max_count$Count, type='l', main="Maximum Cow Count from 1981 to 2020\nPR Headlands", xlab="Season", ylab='Maximum Count')
-plot(14:39, DBcows_max_count$Count, type='l', main="Maximum Cow Count from 1981 to 2020\nDrakes Beach", xlab="Season", ylab='Maximum Count')
-plot(14:39, SBcows_max_count$Count, type='l', main="Maximum Cow Count from 1981 to 2020\nSouth Beach", xlab="Season", ylab='Maximum Count')
+plot(14:39, DBcows_max_count$Count, type='l', main="Maximum Cow Count from 1995 to 2020\nDrakes Beach", xlab="Season", ylab='Maximum Count')
+plot(14:39, SBcows_max_count$Count, type='l', main="Maximum Cow Count from 1995 to 2020\nSouth Beach", xlab="Season", ylab='Maximum Count')
 
 
 # need to go back and look at the dates for these max estimates to make sure they seem reasonable for peak dates
