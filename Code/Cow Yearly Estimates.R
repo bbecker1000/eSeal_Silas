@@ -33,11 +33,6 @@ unique(seals_date$mon)
 # for example season 0 is Nov 1980 to March 1981, season 1 is Nov 1981 to March 1982... season 9 is Nov 1989 to March 1990... season 39 is Nov 2019 to March 2020
 # works for dates passed in as POSIXlt
 
-# i haven't had trouble with this as a vectorized function in terms of output, but i'm not sure if there might be a problem i don't know about
-# i get this warning message when i run it as a vectorized function:
-# In if (date$mon > 9) { :
-#    the condition has length > 1 and only the first element will be used
-
 get_season <- function(date) {
   if (date$mon > 6) {season <- date$year - 80}
   else season <- date$year - 81 
@@ -58,17 +53,6 @@ seals$season <- get_season_all(seals_date)
 
 # subset to grab only cows
 cows <- subset(seals, Age == "COW")
-
-# get largest count for each season by location
-largest_count_by_location <- function(table) {
-  locations <- list("PR Headlands", "Drakes Beach", "South Beach")   #####how to save each table separately???#######
-  for (x in locations) {                                             #####i don't actually use this function but i wish i could#####
-    tbl <- subset(table, Location == x)
-    tbl$month_day <- format(tbl$Date, format="%m-%d")
-    tbl2 <- tbl %>% group_by(season) %>% slice(which.max(Count))
-    print(tbl2)
-  }
-}
 
 # had problems with function above so here is the code for grabbing each location and add the month-day date for each season
 PRcows <- subset(cows, Location == "PR Headlands")
@@ -99,77 +83,167 @@ estimate_pop <- function(row, multTbl) {
   }
 }
 
+# function for lower bound
+estimate_pop_lower <- function(row, multTbl) {
+  if (row$month_day %in% multTbl$Date) {
+    m <- multTbl$Lower[multTbl$Date == row$month_day] 
+    return(m * row$Count)
+  } else {
+    return(0)
+  }
+}
+
+# function for upper bound
+estimate_pop_upper <- function(row, multTbl) {
+  if (row$month_day %in% multTbl$Date) {
+    m <- multTbl$Upper[multTbl$Date == row$month_day] 
+    return(m * row$Count)
+  } else {
+    return(0)
+  }
+}
+
 # function that estimates the population for a table
-# how do i vectorize????? 
 estimate_pop_table <- function(table, multTbl) {
   vec <- numeric()
+  lower <- numeric()
+  upper <- numeric()
   for (i in 1:nrow(table)) {
-    row <- PRcows[i, ]
+    row <- table[i, ]
     est <- estimate_pop(row, multTbl)
+    l <- estimate_pop_lower(row, multTbl)
+    u <- estimate_pop_upper(row, multTbl)
     vec <- c(vec, est)
+    lower <- c(lower, l)
+    upper <- c(upper, u)
   }
   table$estimate <- vec
+  table$lower <- lower
+  table$upper <- upper
   return(table)
 }
 
-# add estimates for all dates available and then get the largest estimate for each year
-# note: some years will have an estimate of 0 because of the dates surveyed
+# add estimates for all dates available 
+# note: some years will have an estimate of 0 because of the dates surveyed, work to correct below
 PRcows <- estimate_pop_table(PRcows, multiplierTable)
 DBcows <- estimate_pop_table(DBcows, multiplierTable)
 SBcows <- estimate_pop_table(SBcows, multiplierTable)
 
-# PRcows missing season 0 for estimate
-PRcows_max_estimate <- PRcows %>% group_by(season) %>% slice(which.max(estimate))
-# DBcows starts at season 14 and is missing seasons 14, 38 (probably because of govt shutdowns/partial counts in 2019)
-DBcows_max_estimate <- DBcows %>% group_by(season) %>% slice(which.max(estimate))
-# SBcows starts at season 14 and is missing seasons 14, 15, 31
-SBcows_max_estimate <- SBcows %>% group_by(season) %>% slice(which.max(estimate))
-
-# combine these tables to get yearly estimates for total
-# use seasons 0 to 14 from PRcows as total estimate
-
-cow_estimate_total = PRcows_max_estimate$estimate[1:15] #0 index so grabs seasons 0 to 14, need the loop to start at season 15
-for (x in 15:39) {
-  pr <- PRcows_max_estimate$estimate[PRcows_max_estimate$season == x]
-  sb <- SBcows_max_estimate$estimate[SBcows_max_estimate$season == x]
-  db <- DBcows_max_estimate$estimate[DBcows_max_estimate$season == x]
-  cow_estimate_total <- c(cow_estimate_total, pr + sb + db)
-}
-
-# I did this first and realized that on the github Ben said to calculate the estimate using the max count for the season so here's that
-# missing estimates for seasons 0, 1, and 13
+# grab the max counts for each season and use the estimate from that date
+# missing estimates for seasons 0 (Jan 6), 1 (Jan 6), and 13 (Feb 9)
 PRcows_max_count <- PRcows %>% group_by(season) %>% slice(which.max(Count))
-# missing estimates for seasons 14, 17, 18, 20, 21, 22, 24, 25, 26, 27, 29, 30, 32, 33, 34, 35, 37, 38 (starts at season 14)
+# missing estimates for season 17 (Feb 9)
 DBcows_max_count <- DBcows %>% group_by(season) %>% slice(which.max(Count))
-# missing estimates for seasons 14, 15, 16, 17, 19, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 33, 35, 36, 37, 38
+# missing estimates for seasons 16 (Dec 28) and 17 (Feb 13)
 SBcows_max_count <- SBcows %>% group_by(season) %>% slice(which.max(Count))
 
-# total max count for all locations
-cow_max_total <- PRcows_max_count$Count[1:15]
-for (x in 15:39) {
-  pr <- PRcows_max_count$Count[PRcows_max_count$season == x]
-  sb <- SBcows_max_count$Count[SBcows_max_count$season == x]
-  db <- DBcows_max_count$Count[DBcows_max_count$season == x]
-  cow_max_total <- c(cow_max_total, pr + sb + db)
+# visually inspected each season with missing estimates. here are my manual fixes, explanations, and questions
+
+Prcows0 <- subset(PRcows, season == 0)
+# three observations on Jan 6, 7, 8 all with a count of 2
+# no correction made; left at 0
+
+PRcows1 <- subset(PRcows, season == 1)
+# highest count of 2 occurs on Jan 6, 7, 9, and 11, my function above just takes any one of these counts
+# and happened to grab one out of range of Condit's dates. Luckily, Jan 11 is in their range, so use that estimate
+PRcows_max_count$estimate[PRcows_max_count$season == 1] <- PRcows1$estimate[PRcows1$month_day == "01-11"]
+PRcows_max_count$lower[PRcows_max_count$season == 1] <- PRcows1$lower[PRcows1$month_day == "01-11"]
+PRcows_max_count$upper[PRcows_max_count$season == 1] <- PRcows1$upper[PRcows1$month_day == "01-11"]
+PRcows_max_count$month_day[PRcows_max_count$season == 1] <- "01-11"
+PRcows_max_count$Date[PRcows_max_count$season == 1] <- PRcows1$Date[5]
+
+PRcows13 <- subset(PRcows, season == 13)
+# only one observation falls within Condit's date range: Jan 14 with count of 141 and estimate of 255.21
+# max count occurs on Feb 9 with a count of 154
+# should we use the Jan 14 estimate OR use the Feb 9 count * Feb 8 multiplier (because it's only one day off)?
+# Feb 9 count * Feb 8 multiplier = 227.766
+# no correct made; left at 0
+
+DBcows17 <- subset(DBcows, season == 17)
+# max count occurs on Feb 9 with a count of 53
+# have estimates for rows 6-13
+DBdates17 <- DBcows17$month_day[6:13]
+DBest17 <- DBcows17$estimate[6:13]
+DBcounts17 <- DBcows17$Count[6:13]
+# "01-13" "01-19" "01-21" "01-24" "01-27" "01-30" "01-31" "02-03"
+# 3.892    20.580 25.480   23.620   27.312 33.031  28.725  46.132
+# 2           15    20       20        24     29     25      38
+# same question as above should we use Feb 9 * Feb 8 multiplier:
+# 53 * multiplierTable$Multiplier[multiplierTable$Date == "02-08"] = 78.387 
+# no correct made; left at 0
+
+SBcows16 <- subset(SBcows, season == 16)
+# 4 total observations on 12-28, 01-09, 01-27, 01-31 all have same count (1) 
+# Jan 27 has an estimate of 1.138 and Jan 31 has an estimate of 1.149
+# these are very similar so I chose to use Jan 27 estimate arbitrarily
+SBcows_max_count$estimate[SBcows_max_count$season == 16] <- SBcows16$estimate[SBcows16$month_day == "01-27"]
+SBcows_max_count$lower[SBcows_max_count$season == 16] <- SBcows16$lower[SBcows16$month_day == "01-27"]
+SBcows_max_count$upper[SBcows_max_count$season == 16] <- SBcows16$upper[SBcows16$month_day == "01-27"]
+SBcows_max_count$month_day[SBcows_max_count$season == 16] <- "01-27"
+SBcows_max_count$Date[SBcows_max_count$season == 16] <- SBcows16$Date[3]
+
+SBcows17 <- subset(SBcows, season == 17)
+# max count occurs on Feb 13 with count of 12
+# have esimates for rows 7 to 14
+SBdates17 <- SBcows17$month_day[7:14]
+SBest17 <- SBcows17$estimate[7:14]
+SBcounts17 <- SBcows17$Count[7:14]
+# "01-13" "01-19" "01-21" "01-24" "01-27" "01-30" "01-31" "02-03" "02-09" "02-13"
+# 1.946   1.372     5.096  3.543   3.414   5.695   3.447   8.498    NA      NA
+# 1         1         4      3       3        5      3       7       5      12
+# i feel less comfortable proposing to use max count * Feb 8 multiplier but in this case it is
+# 12 * multiplierTable$Multiplier[multiplierTable$Date == "02-08"] = 17.748
+# # no correct made; left at 0
+
+
+# calculate totals across locations for cows
+# pass in tbales for each location and col as a string 
+total_max_count <- function(PR, SB, DB, col) {
+  vec <- vector("list", 40)
+  for (i in 0:39) {
+    a <- PR[[col]][PR$season == i]
+    if (identical(a, numeric(0))) { a <- 0}
+    b <- SB[[col]][SB$season == i]
+    if (identical(b, numeric(0))) { b <- 0}
+    c <- DB[[col]][DB$season == i]
+    if (identical(c, numeric(0))) { c <- 0}
+    vec[[i+1]] <- a + b + c # lists aren't zero indexed here
+  }
+  return(vec)
 }
 
-# i haven't really dug into the tables i created yet, this is just the code to get there
-# here are some plots
+# total max count for all locations
+cow_max_total <- total_max_count(PRcows_max_count, SBcows_max_count, DBcows_max_count, "Count")
+# estimations
+cow_est_total <- total_max_count(PRcows_max_count, SBcows_max_count, DBcows_max_count, "estimate")
+cow_est_lower_total <- total_max_count(PRcows_max_count, SBcows_max_count, DBcows_max_count, "lower")
+cow_est_upper_total <- total_max_count(PRcows_max_count, SBcows_max_count, DBcows_max_count, "upper")
 
 # plot total estimates and max counts for each season
-plot(0:39, cow_estimate_total, type='l', main="Estimated Cow Count from 1981 to 2020\nAll Locations", xlab="Season", ylab='Estimated Count')
-plot(0:39, cow_max_total, type='l', main="Maximum Cow Count from 1981 to 2020\nAll Locations", xlab="Season", ylab='Maximum Count')
+plot(1981:2020, cow_est_total, main="Estimated Cow Count from 1981 to 2020\nAll Locations", xlab="Year", ylab='Estimate', pch=15)
+lines(1981:2020, cow_est_total)
+lines(1981:2020, cow_est_lower_total)
+lines(1981:2020, cow_est_upper_total)
 
 # can also plot for each location
-plot(0:39, PRcows_max_estimate$estimate, type='l', main="Estimated Cow Count from 1981 to 2020\n PR Headlands", xlab="Season", ylab='Estimated Count')
-plot(14:39, DBcows_max_estimate$estimate, type='l', main="Estimated Cow Count from 1995 to 2020\n Drakes Beach", xlab="Season", ylab='Estimated Count')
-plot(14:39, SBcows_max_estimate$estimate, type='l', main="Estimated Cow Count from 1995 to 2020\n South Beach", xlab="Season", ylab='Estimated Count')
+# these plots will plot 0 for missing estimates
+plot(1981:2020, PRcows_max_count$estimate, main="Estimated Cow Count from 1981 to 2020\nPR Headlands", xlab="Year", ylab='Estimate', pch=15)
+lines(1981:2020, PRcows_max_count$estimate)
+lines(1981:2020, PRcows_max_count$lower, col="grey")
+lines(1981:2020, PRcows_max_count$upper, col="grey")
+plot(1995:2020, DBcows_max_count$estimate, main="Estimated Cow Count from 1995 to 2020\nDrakes Beach", xlab="Year", ylab='Estimate', pch=15)
+lines(1995:2020, DBcows_max_count$estimate)
+lines(1995:2020, DBcows_max_count$lower, col="grey")
+lines(1995:2020, DBcows_max_count$upper, col="grey")
+plot(1995:2020, SBcows_max_count$estimate, main="Estimated Cow Count from 1995 to 2020\nSouth Beach", xlab="Year", ylab='Estimate', pch=15)
+lines(1995:2020, SBcows_max_count$estimate)
+lines(1995:2020, SBcows_max_count$lower, col="grey")
+lines(1995:2020, SBcows_max_count$upper, col="grey")
 
-plot(0:39, PRcows_max_count$Count, type='l', main="Maximum Cow Count from 1981 to 2020\nPR Headlands", xlab="Season", ylab='Maximum Count')
-plot(14:39, DBcows_max_count$Count, type='l', main="Maximum Cow Count from 1995 to 2020\nDrakes Beach", xlab="Season", ylab='Maximum Count')
-plot(14:39, SBcows_max_count$Count, type='l', main="Maximum Cow Count from 1995 to 2020\nSouth Beach", xlab="Season", ylab='Maximum Count')
-
-
-# need to go back and look at the dates for these max estimates to make sure they seem reasonable for peak dates
-# and determine if there's a better strategy for calculating season estimates
-
+# do the max count dates seem reasonable?
+PRdays <- unique(PRcows_max_count$month_day)
+# range for PR: Jan 6 to Feb 9
+DBdays <- unique(DBcows_max_count$month_day)
+# range for DB: Jan 23 to Feb 9
+SBdays <- unique(SBcows_max_count$month_day)
+# range for SB: Jan 17 to Feb 13
