@@ -134,6 +134,60 @@ pups_total <- total_max_count(pups_max_all)
 plot(1981:2020, pups_total, main="Total Pup Counts for All Locations", xlab="Year", ylab="Count", pch=15)
 lines(1981:2020, pups_total)
 
-# do we need to worry about a specific date range here???
+# need to combine pups and weaned pups. pups don't move between beaches but weaned pups might so need to take max count for a single day
+
+# takes in a table and returns a list indexed by season
+# each item in the returned list is a list of all locations counts exist for in that season
+which_seasons <- function(table) {
+  seasons <- unique(table$season) 
+  vec <- vector("list", length(seasons))
+  names(vec) <- seasons
+  for (i in 1:length(seasons)) {
+    tb <- subset(table, season == seasons[[i]])
+    locations <- unique(tb$Location)
+    vec[[i]] <- locations
+  }
+  return(vec)
+}
+
+# returns a table with dates and counts combined across locations
+combine_counts <- function(list, table) {
+  df <- data.frame(Date=as.Date(character()), Count=numeric(), season=numeric(), year=numeric())
+  for (i in 1:length(list)) {
+    szn <- as.numeric(names(list)[i])
+    yr <- szn + 1981
+    locations <- list[[i]]
+    t <- subset(table, season == szn)
+    dates <- unique(t$Date)
+    for (j in 1:length(dates)) {
+      d <- subset(t, Date == dates[j])
+      sum <- 0
+      for (k in 1:nrow(d)) {
+        sum <- sum + d[k, ]$Count
+      }
+      r <- data.frame(dates[j], sum, szn, yr)
+      names(r) <- c("Date", "Count", "season", "year")
+      df <- rbind(df, r)
+    }
+  }
+  return(df)
+}
+
+wnr <- subset(seals, Age == "WNR")
+pw <- rbind(wnr, pups)
+
+pw_locations <- which_seasons(pw)
+pw_all <- combine_counts(pw_locations, pw)
+pw_all_max_counts <- pw_all %>% group_by(season) %>% slice(which.max(Count))
+
+# plot Pups and Weaned Pups
+title <- paste ("Maximum Pup and Weaned Pup Counts")
+plot(pw_all_max_counts$year, pw_all_max_counts$Count, main=title, xlab="Year", ylab='Maximum Count', pch=15)
+lines(pw_all_max_counts$year, pw_all_max_counts$Count)
 
 # later on combine pup and wnr (accurate through 2014-2015)
+# wonder: what is the difference between weaner and yearling? seems like yearling is more plausibly inaccurate around 2015 than weaner
+# also, do we need to worry about a specific date range for age classes other than cow???
+
+
+
