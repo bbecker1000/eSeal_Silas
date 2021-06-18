@@ -1,3 +1,7 @@
+##################################################
+#####DONT USE THIS INSTEAD USE NEW COW COUNTS#####
+##################################################
+
 # Notes about the data:
 # Feb/March 1983 Access was restricted because road was washed out due to  El Nino storms)
 # Did not include partial surveys completed during the 2018/2019 government shutdown
