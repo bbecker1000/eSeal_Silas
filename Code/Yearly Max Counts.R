@@ -1,3 +1,8 @@
+#######################################################
+######DONR USE THIS INSTEAD USE OTHER AGE CLASSES######
+#######################################################
+
+
 # Notes about the data:
 # (directly from spreadsheet)
 # Feb/March 1983 Access was restricted because road was washed out due to  El Nino storms)
