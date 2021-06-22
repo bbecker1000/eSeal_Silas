@@ -27,4 +27,19 @@ Next steps:
     i. Use either the ATSAR package or the MARSS package to build multivariate state-space models of the three sites to get population trajectories
     ii. ATSAR: https://nwfsc-timeseries.github.io/atsa-labs/
       chapters 7, 8, 13, 
+      
+## 2021-06-22
+1. Silas and Sarah Codde have worked out most issues with counts
+2. Create plots that are well laid out 
+3. TRENDS Focus on Cows and can also do pups. 
+  A. FIRST BASIC
+    i. Simple linear regression on log(counts) for cows and pups/weaners at the three sites and as a whole. 
+    ii. Could also do generalized linear model with counts as poisson (?) distributed
+    iii. Generalized additive mixed models (NEW)
+   B. THEN MAYBE ADVANCED
+    i. Use either the ATSAR package or the MARSS package to build multivariate state-space models of the three sites to get population trajectories
+    ii. ATSAR: https://nwfsc-timeseries.github.io/atsa-labs/
+      chapters 7, 8, 13, 
+
+
   
