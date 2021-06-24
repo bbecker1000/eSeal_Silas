@@ -28,18 +28,38 @@ Next steps:
     ii. ATSAR: https://nwfsc-timeseries.github.io/atsa-labs/
       chapters 7, 8, 13, 
       
-## 2021-06-22
+## 2021-06-24
 1. Silas and Sarah Codde have worked out most issues with counts
 2. Create plots that are well laid out 
 3. TRENDS Focus on Cows and can also do pups. 
-  A. FIRST BASIC
+  A. FIRST BASIC for exploratory analyses.   Silas - We may not use these as final models so don't try to get perfect results/code,
+                                                     just run to see what we get and to get familiar with the approaches and building the models.
+                                                     I anticipate just spending ~1 week on this and then we'll move foward with the ADVANCED techniques (MARSS and ATSAR) I mentioned above
     i. Simple linear regression on log(counts) for cows and pups/weaners at the three sites and as a whole. 
-    ii. Could also do generalized linear model with counts as poisson (?) distributed
+            a. use the lm function in R to build linear models for each.   Year is independent variable, mean counts are dependent variable. 
+            b. I suspect these models will not fit well.     
+    ii. Could also do generalized linear mixed-model with counts as poisson (?) distributed
+            a. same as above but use the package 'lme4' to build models that look like this:
+            b. m.glmer <- glmer(Count ~ Year + (1|Site), family = poisson, data = DATA)  ## this dataset shouldhave the three sites in it and allows different intercepts for sites.
+            c. m.glm <- glm(Count ~ Year, family = poisson, data = DATA) # also run on the entire population without variance for site.
     iii. Generalized additive mixed models (NEW)
-   B. THEN MAYBE ADVANCED
-    i. Use either the ATSAR package or the MARSS package to build multivariate state-space models of the three sites to get population trajectories
-    ii. ATSAR: https://nwfsc-timeseries.github.io/atsa-labs/
-      chapters 7, 8, 13, 
+            a. use the package 'gamm4' if you have trouble getting to run, also try 'mgcv' package.
+            b. I think the model will be something like this:
+               m.gamm <- gamm(Count ~ Year, random =~(1|Site), family = poisson, data = DATA)
+            c. can also try without breaking into sites on whole population:
+               m.gam <- gam(gamm(Count ~ Year, family = poisson, data = DATA)
+               
+               Some general thoughts. 
+               - If the poisson distributions are problematic, you can try 'negative.binomial(1)',
+               or even logging the count data and running as a normal model.
+               - look at the package information for examples on running models
+               - in R can type '?function.name' to get help/examples.  also look for vignettes online which are helpful 
+               - this is just for pups+weaners and cows.
+               - Again, this is just a preliminary look, so don't get stuck on dead ends.
+
+      
+  
+ 
 
 
   
