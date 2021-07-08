@@ -27,11 +27,7 @@ ggplot(DATA, aes(Year, Count, line = Count_Type)) +
 
 library(tscount)
 
-<<<<<<< HEAD
 
-=======
-campy
->>>>>>> 70811d91a33ac3f975468ecd782e2db062cbe271
 
 CowDataTot <- tidySeals %>% filter(Age == "COW")
 CowDataTot <- CowDataTot %>% filter(Count_Type == "estimate" & Location == "All")
@@ -39,16 +35,16 @@ CowDataTot <- as.vector(as.integer(CowDataTot$Count))
 
 plot(CowDataTot)
 
-<<<<<<< HEAD
+
 TIME <- as.vector(c(1:length(CowDataTot)))
-=======
-TIME <- as.vector(c(1:lengths(CowDataTot)))
->>>>>>> 70811d91a33ac3f975468ecd782e2db062cbe271
+
+
 
 # run a poisson and nb model
 # need to add ENSO years and to prediction
 
-<<<<<<< HEAD
+
+
 # Enso from https://www.coaps.fsu.edu/jma
 SOI <- c(1983, 1987, 1992, 1998, 
          2003, 2007, 2010, 2015, 2016, 2019)
@@ -70,7 +66,7 @@ cow_fit_nb.soi <- tsglm(CowDataTot, model = list(past_obs = c(1,2), past_mean = 
 
 summary(cow_fit_nb)
 summary(cow_fit_nb.soi) #Higher aic by 15 units with SOI included so dropped
-=======
+
 
 cow_fit_poisson <- tsglm(CowDataTot, model = list(past_obs = c(1:2), past_mean = 3), link = "log", distr = "poisson",
                          xreg = TIME)
@@ -78,9 +74,10 @@ cow_fit_nb <- tsglm(CowDataTot, model = list(past_obs = c(1,2), past_mean = 3), 
                          xreg = TIME)
 
 summary(cow_fit_nb)
->>>>>>> 70811d91a33ac3f975468ecd782e2db062cbe271
+
 plot(cow_fit_nb)
 
+par(ask=F)
 # go with nb model
 pred1.pred <- predict(cow_fit_nb, n.ahead = 10, level = 0.8, global = TRUE,  # 80% CI
            B = 2000, newxreg = c(41:50))$pred  ## add ten years into future
@@ -104,33 +101,26 @@ PlotData <- plyr::rbind.fill(PlotData, PredData) # function stacks data frames w
 
 ggplot(PlotData, aes(YEAR, Estimate, color = ifelse(YEAR>2020, "Predicted", "Estimated"))) +
   geom_pointrange(aes(ymin = Lower, ymax = Upper)) +
-<<<<<<< HEAD
+
   scale_x_continuous(limits = c(1983, 2030))+
   scale_y_log10() +
   geom_vline(xintercept = 2010, lty = 2) +
   labs(color=NULL) 
-=======
-  scale_x_continuous(limits = c(1982, 2030))
->>>>>>> 70811d91a33ac3f975468ecd782e2db062cbe271
 
 ## let's get the lambda values over time for the entire population
 PlotData <- PlotData %>% mutate(lambda = Estimate / lag(Estimate , default = first(Estimate)))
 
 ggplot(PlotData, aes(YEAR, lambda)) +
-<<<<<<< HEAD
+
     geom_point(aes(color = ifelse(YEAR>2020, 'Predicted', 'Estimated'))) +
     scale_x_continuous(limits = c(1985, 2030)) +
     ylim(0.5, 1.7) +
     geom_smooth(method = "loess", level = 0.8) +
     #geom_vline(xintercept = 2020.5, lty = 2) +
     labs(color=NULL) 
-=======
-    geom_point(aes(color = ifelse(YEAR>2020, 'dark blue', 'red'))) +
-    scale_x_continuous(limits = c(1985, 2030)) +
-    ylim(0.5, 1.7) +
-    geom_smooth(method = "loess", level = 0.8) +
-    geom_vline(xintercept = 2020.5, lty = 2)
->>>>>>> 70811d91a33ac3f975468ecd782e2db062cbe271
+
+
+
 
 
 
