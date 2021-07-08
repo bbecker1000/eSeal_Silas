@@ -40,16 +40,15 @@ SOI <- c(1983, 1987, 1992, 1998,
 time <- 1981:2020
 
 SOI.YN <- as.vector(as.integer(ifelse(time %in% SOI, 1, 0))) # these are the enso years
-regressors <- cbind(TIME, SOI.YN) #put the two covariates into a file
+regressors <- cbind(TIME, SOI.YN) #put the two covariates into a file for model below.
 
-#models
+#models comparing Poisson, nb, and nb with ENSO and differing autocorrelation lengths.
 cow_fit_poisson <- tsglm(CowDataTot, model = list(past_obs = c(1:2), past_mean = 3), link = "log", distr = "poisson",
                          xreg = regressors)
 cow_fit_nb <- tsglm(CowDataTot, model = list(past_obs = c(1,2), past_mean = 3), link = "log", distr = "nbinom",
                          xreg = TIME)
 cow_fit_nb.small <- tsglm(CowDataTot, model = list(past_obs = c(1)), link = "log", distr = "nbinom",
                     xreg = TIME)
-
 cow_fit_nb.soi <- tsglm(CowDataTot, model = list(past_obs = c(1,2), past_mean = 3), link = "log", distr = "nbinom",
                     xreg = regressors)
 
