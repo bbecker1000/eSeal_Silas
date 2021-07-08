@@ -3,8 +3,15 @@ library(dplyr)
 library(lme4)
 library(gamm4)
 
-setwd("~/Internship Summer 2021")
-seals <- read_excel("Eseal_1981-2020.xlsx")
+
+## BB changing directories
+## Silas you may need to uncomment lines 10-11 and comment line 12 to run on your machine.
+## I recommend you keep your data in a "Data" subdirectory as we have in the github repo so we can use the same code. Rstudio sets your project
+## directory as your working directory, then you can use relative paths and no need for "setwd".
+
+#setwd("~/Internship Summer 2021")
+#seals <- read_excel("Eseal_1981-2020.xlsx")
+seals <- read_excel("Data/Eseal_1981-2020.xlsx")
 # get rid of weird column
 seals <- subset(seals, select = -(...6))
 
@@ -452,7 +459,7 @@ for (i in 1981:2020) {
   }
   
   
-  # get the conts from all locations
+  # get the counts from all locations
   max <- data.frame("COW", i, "All", cow_max_total[season], "max")
   names(max) <- c("Age", "Year", "Location", "Count", "Count_Type")
   tidyCows <- rbind(tidyCows, max)
@@ -668,3 +675,4 @@ plot(fitted(ga_pupwnr), resid(ga_pupwnr))
 
 #look into breakpoints -> two piecewise linear models https://cran.r-project.org/web/packages/segmented/segmented.pdf
 #https://cran.r-project.org/web/packages/jtools/vignettes/summ.html
+
