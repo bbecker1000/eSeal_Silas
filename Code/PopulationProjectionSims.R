@@ -1,8 +1,8 @@
 
 ##---what does the future hold?
-## let's do 20 years
-## use lambda since 2001
-
+## let's do 10 years.
+## use lambda since 2006
+## need to make sure PlotData available from "final-ish.R
 
 
 lambda_mean <- PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
@@ -15,7 +15,7 @@ lambda_sd <- PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
 ## loop
 set.seed(2)
 N0 = 1597  #initial population size
-times = 20  #number of years into the future
+times = 10  #number of years into the future
 N = vector(length = times)  #empty vector to store pop. sizes
 N[1] = N0  #initial population size should be the first N
 
@@ -36,11 +36,11 @@ plot(1:times, N, type = "b", las = 1)
 set.seed(2)
 sims = 100
 outmat = sapply(1:sims, function(x) {
-  times = 20
+  times = 10
   N0 = 1597
   N = vector(length = times)
   N[1] = N0
-  LAMBDA = rnorm(times - 1, 1.064, 0.068)
+  LAMBDA = rnorm(times - 1, 1.064, 0.068)  # can try larger sd for more storm years
   for (t in 2:times) {
     N[t] = N[t - 1] * LAMBDA[t - 1]
   }
@@ -48,7 +48,7 @@ outmat = sapply(1:sims, function(x) {
 })
 matplot(1:times, outmat, type = "l", las = 1, ylab = "Population Size", 
         xlab = "Years")
-abline(h = 1029, lty = 2)
+abline(h = 1597, lty = 2)
 
 ## try to plot with ggplot
 outmat_tib <- as_tibble(outmat)
@@ -65,15 +65,18 @@ out_gathered$RealYear <- out_gathered$Year + 2020
 ## plot it
 
 pSim <- ggplot(out_gathered, aes(RealYear, SimCount, group = Simulation)) + 
-  geom_smooth(se = FALSE, size = 0.1, level = 0.5, alpha=0.01) +
-  geom_hline(aes(yintercept = 1029)) + 
+  geom_smooth(se = FALSE, size = 0.1, level = 0.95, alpha=0.5, color = 'gray') +
+  #geom_hline(aes(yintercept = 1597)) + 
   labs(x = "Year", y = "Female elephant seals",
        title = "Projected Female Elephant Seal Population Size at Point Reyes National Seashore",
-       subtitle = paste("500 Simulations:", "\u03BB = 0.07 \u00B1 0.11")) +
+       subtitle = paste("100 Simulations:", "\u03BB = 0.06 \u00B1 0.07")) +
   ylim(0, 10000) + 
-  scale_y_continuous(breaks=c(seq(0, 10000, by = 2000)))
+  theme_gray(base_size = 18) +
+  scale_y_continuous(limits = c(0, 5000), breaks=c(seq(0, 5000, by = 500))) +
+  scale_x_continuous(limits = c(2020, 2030), breaks=c(seq(2020, 2030, by = 2)))
 
-pSim_plot <- pSim + geom_smooth(aes(group = 1), alpha = 1, level = 0.99)
+
+pSim_plot <- pSim + geom_smooth(aes(group = 1), se = FALSE, color = 'red')
 pSim_plot
 
 ## make histogram of final values
