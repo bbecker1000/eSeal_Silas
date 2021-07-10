@@ -36,7 +36,7 @@ plot(1:times, N, type = "b", las = 1)
 set.seed(2)
 sims = 100
 outmat = sapply(1:sims, function(x) {
-  times = 10
+  times = 11
   N0 = 1597
   N = vector(length = times)
   N[1] = N0
@@ -46,9 +46,6 @@ outmat = sapply(1:sims, function(x) {
   }
   N
 })
-matplot(1:times, outmat, type = "l", las = 1, ylab = "Population Size", 
-        xlab = "Years")
-abline(h = 1597, lty = 2)
 
 ## try to plot with ggplot
 outmat_tib <- as_tibble(outmat)
@@ -60,7 +57,7 @@ out_gathered <- gather(outmat_tib, Simulation, SimCount)
 out_gathered$Year <- rep(1:NROW(outmat_tib), times = sims)
 
 ## give RealYear
-out_gathered$RealYear <- out_gathered$Year + 2020 
+out_gathered$RealYear <- out_gathered$Year + 2019 
 
 ## plot it
 
@@ -72,9 +69,8 @@ pSim <- ggplot(out_gathered, aes(RealYear, SimCount, group = Simulation)) +
        subtitle = paste("100 Simulations:", "\u03BB = 0.06 \u00B1 0.07")) +
   ylim(0, 10000) + 
   theme_gray(base_size = 18) +
-  scale_y_continuous(limits = c(0, 5000), breaks=c(seq(0, 5000, by = 500))) +
+  scale_y_continuous(limits = c(0, 6000), breaks=c(seq(0, 6000, by = 1000))) +
   scale_x_continuous(limits = c(2020, 2030), breaks=c(seq(2020, 2030, by = 2)))
-
 
 pSim_plot <- pSim + geom_smooth(aes(group = 1), se = FALSE, color = 'red')
 pSim_plot
