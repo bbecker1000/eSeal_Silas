@@ -19,6 +19,7 @@ DATA <- DATA %>% filter(Count_Type != "max")       # filter out the cow max sinc
 ggplot(DATA, aes(Year, Count, line = Count_Type)) +
   geom_line(color = "blue") +
   geom_point(size = 0.1) +
+  theme_gray(base_size = 14) +
   facet_grid(Location ~ Age)
 
 
@@ -111,6 +112,11 @@ PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
 
 PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
   summarize(sd_lambda = sd(lambda))
+
+label1 = ("Lambda[2006-2020] = 1.06 ± 0.07")
+
+p.lambda + annotate(geom = "text", x = 2020, y = 1.5, 
+                    label = label1)
 
 cowplot::plot_grid(p.cows, p.lambda, ncol = 1)
 
