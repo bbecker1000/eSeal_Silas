@@ -78,14 +78,16 @@ pSim_plot <- pSim + geom_smooth(aes(group = 1), se = FALSE, color = 'red')
 pSim_plot
 
 ## make histogram of final values
-max_counts <- filter(out_gathered, Year == 20)
+max_counts <- filter(out_gathered, RealYear == 2030)
 hist(max_counts$SimCount)
+
+YEAR = 2030
 
 max_hist <-ggplot(max_counts, aes(SimCount)) +
   labs(x = "Female elephant seals",
-       title = "Projected Female Elephant Seal Population Size at Point Reyes National Seashore",
-       subtitle = paste("500 Simulations:", "\u03BB = 0.06 \u00B1 0.07")) + 
-  geom_histogram() 
+       title = paste("Projected", YEAR, "Female Elephant Seal Population Size at PRNS"),
+       subtitle = paste("100 Simulations:", "\u03BB = 0.06 \u00B1 0.07")) + 
+  geom_histogram(bins = 10) 
 max_hist
 
 
