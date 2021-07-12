@@ -8,6 +8,8 @@
 lambda_mean <- PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
   summarize(mean_lambda = mean(lambda))
 
+hist(PlotData$lambda[16:40]) # should we use a normal-symmetrical distribution of sd for projections?
+
 lambda_sd <- PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
   summarize(sd_lambda = sd(lambda))
 
@@ -15,7 +17,7 @@ lambda_sd <- PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
 ## loop
 set.seed(2)
 N0 = 1597  #initial population size
-times = 10  #number of years into the future
+times = 11  #number of years into the future
 N = vector(length = times)  #empty vector to store pop. sizes
 N[1] = N0  #initial population size should be the first N
 

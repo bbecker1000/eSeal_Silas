@@ -44,6 +44,8 @@ SOI.YN <- as.vector(as.integer(ifelse(time %in% SOI, 1, 0))) # these are the ens
 regressors <- cbind(TIME, SOI.YN) #put the two covariates into a file for model below.
 
 #models comparing Poisson, nb, and nb with ENSO and differing autocorrelation lengths.
+cow_fit_nb.indep <- tsglm(CowDataTot, link = "log", distr = "nbinom",
+                          xreg = regressors)
 cow_fit_poisson <- tsglm(CowDataTot, model = list(past_obs = c(1:2), past_mean = 3), link = "log", distr = "poisson",
                          xreg = regressors)
 cow_fit_nb <- tsglm(CowDataTot, model = list(past_obs = c(1,2), past_mean = 3), link = "log", distr = "nbinom",
@@ -53,9 +55,12 @@ cow_fit_nb.small <- tsglm(CowDataTot, model = list(past_obs = c(1)), link = "log
 cow_fit_nb.soi <- tsglm(CowDataTot, model = list(past_obs = c(1,2), past_mean = 3), link = "log", distr = "nbinom",
                     xreg = regressors)
 
+#look at AICs
+summary(cow_fit_nb.indep)
+summary(cow_fit_poisson)
 summary(cow_fit_nb)
 summary(cow_fit_nb.soi) #Higher aic by 15 units with SOI included so dropped
-summary(cow_fit_nb.small)  #just first order autocorr - lowest AIC
+summary(cow_fit_nb.small)  #just first order autocorr = lowest AIC
 plot(cow_fit_nb.small)
 par(ask=F) # reset graphics
 
@@ -80,7 +85,7 @@ PlotData <- plyr::rbind.fill(PlotData, PredData) # function stacks data frames w
 p.cows <- ggplot(PlotData, aes(YEAR, Estimate, color = ifelse(YEAR>2020, "Predicted", "Estimated"))) +
   geom_pointrange(aes(ymin = Lower, ymax = Upper)) +
   scale_x_continuous(limits = c(1983, 2030)) +
-  scale_y_log10() +
+  #scale_y_log10() +
   #geom_vline(xintercept = 2010, lty = 2) +
   labs(color=NULL) +
   ylab("Estimated Cows") +
@@ -91,6 +96,16 @@ p.cows
 
 ## let's get the lambda values over time for the entire population
 PlotData <- PlotData %>% mutate(lambda = Estimate / lag(Estimate , default = first(Estimate)))
+
+
+## get mean lambda 2006-2020
+PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
+  summarize(mean_lambda = mean(lambda))
+
+PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
+  summarize(sd_lambda = sd(lambda))
+
+label1 = "Lambda[2006-2020] = 1.06 ± 0.07"
 
 # plot lambda
 p.lambda <- ggplot(PlotData, aes(YEAR, lambda)) +
@@ -103,20 +118,10 @@ p.lambda <- ggplot(PlotData, aes(YEAR, lambda)) +
   ylab(expression(lambda)) +
   xlab("Year") +
   theme_classic(base_size = 20) +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  annotate(geom = "text", x = 2020, y = 1.5, label = label1) 
 p.lambda
 
-## get mean lambda 2006-2020
-PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
-  summarize(mean_lambda = mean(lambda))
-
-PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
-  summarize(sd_lambda = sd(lambda))
-
-label1 = ("Lambda[2006-2020] = 1.06 ± 0.07")
-
-p.lambda + annotate(geom = "text", x = 2020, y = 1.5, 
-                    label = label1)
 
 cowplot::plot_grid(p.cows, p.lambda, ncol = 1)
 
