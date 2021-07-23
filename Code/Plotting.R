@@ -45,35 +45,50 @@ SOI.YN <- as.vector(as.integer(ifelse(time %in% SOI, 1, 0))) # these are the ens
 regressors <- cbind(TIME, SOI.YN) #put the two covariates into a file for model below.
 
 #models comparing Poisson, nb, and nb with ENSO and differing autocorrelation lengths.
-cow_fit_nb.indep <- tsglm(CowDataTot, link = "log", distr = "nbinom",
-                          xreg = regressors)
-cow_fit_poisson <- tsglm(CowDataTot, model = list(past_obs = c(1,2), past_mean = 3), link = "log", distr = "poisson",
-                         xreg = regressors)
+cow_fit_nb.3 <- tsglm(CowDataTot, model = list(past_obs = c(1:3)), link = "log", distr = "nbinom",
+                      xreg = TIME)
+cow_fit_nb.2.3 <- tsglm(CowDataTot, model = list(past_obs = c(1), past_mean = c(1:10)), link = "log", distr = "nbinom",
+                    xreg = TIME)
+
+cow_fit_nb.5 <- tsglm(CowDataTot, model = list(past_obs = c(1:5)), link = "log", distr = "nbinom",
+                      xreg = TIME)
+cow_fit_nb.10 <- tsglm(CowDataTot, model = list(past_obs = c(1:10)), link = "log", distr = "nbinom",
+                          xreg = TIME)
+cow_fit_nb.15 <- tsglm(CowDataTot, model = list(past_obs = c(1:15)), link = "log", distr = "nbinom",
+                       xreg = TIME)
+cow_fit_poisson <- tsglm(CowDataTot, model = list(past_obs = c(1:5)), link = "log", distr = "poisson",
+                         xreg = TIME)
 cow_fit_nb <- tsglm(CowDataTot, model = list(past_obs = c(1,2), past_mean = 3), link = "log", distr = "nbinom",
                          xreg = TIME)
-cow_fit_nb.small <- tsglm(CowDataTot, model = list(past_obs = c(1)), link = "log", distr = "nbinom",
-                    xreg = TIME)
-cow_fit_nb.soi <- tsglm(CowDataTot, model = list(past_obs = c(1,2), past_mean = 3), link = "log", distr = "nbinom",
+cow_fit_nb.soi <- tsglm(CowDataTot, model = list(past_obs = c(1)), link = "log", distr = "nbinom",
                     xreg = regressors)
+cow_fit_nb.small <- tsglm(CowDataTot, model = list(past_obs = c(1), past_mean = 10), link = "log", distr = "nbinom",
+                          xreg = TIME)
+
 
 #look at AICs
-summary(cow_fit_nb.indep)
-summary(cow_fit_poisson)
-summary(cow_fit_nb)
-summary(cow_fit_nb.soi) #Higher aic by 15 units with SOI included so dropped
-summary(cow_fit_nb.small)  #just first order autocorr = lowest AIC
-plot(cow_fit_nb.small)
+AIC(cow_fit_poisson)
+AIC(cow_fit_nb.2.3)
+AIC(cow_fit_nb.3)
+AIC(cow_fit_nb.5)
+AIC(cow_fit_nb.10)
+AIC(cow_fit_nb.15)
+AIC(cow_fit_nb.soi) #Higher aic by 15 units with SOI included so dropped
+AIC(cow_fit_nb.small)  #just first order autocorr = lowest AIC
+#plot(cow_fit_nb.small)
 par(ask=F) # reset graphics
 
-# go with nb model for predictions 10 years into future
-pred1.pred <- predict(cow_fit_nb.small, n.ahead = 10, level = 0.8, global = TRUE,  # 80% CI
+BESTMODEL <- cow_fit_nb.15
+
+# go with nb model for cow_fit_nb.soi 10 years into future
+pred1.pred <- predict(BESTMODEL, n.ahead = 10, level = 0.8, global = TRUE,  # 80% CI
            B = 2000, newxreg = c(41:50))$pred  ## add ten years into future
-pred1.interval <- predict(cow_fit_nb.small, n.ahead = 10, level = 0.8, global = TRUE,
+pred1.interval <- predict(BESTMODEL, n.ahead = 10, level = 0.8, global = TRUE,
                       B = 2000, newxreg = c(41:50))$interval
 # plot
 # make a DataFrame for plotting
 YEAR <- 1981:2020
-Estimate <- round(cow_fit_nb.small[["fitted.values"]])
+Estimate <- round(BESTMODEL[["fitted.values"]])
 PlotData <- data.frame(YEAR, Estimate)
 
 Estimate <- pred1.pred
@@ -125,6 +140,30 @@ p.lambda
 
 
 cowplot::plot_grid(p.cows, p.lambda, ncol = 1)
+
+
+#### another time series method....state space
+library(dlm)
+logCow <- log(CowDataTot)
+dlmCow <- dlmModPoly(logCow)
+cowFilt <- dlmFilter(CowDataTot, mod = dlmCow)
+
+gasFore <- dlmForecast(cowFilt, nAhead = 10)
+sqrtR <- sapply(gasFore$R, function(x) sqrt(x[1,1]))
+pl <- gasFore$a[,1] + qnorm(0.05, sd = sqrtR)
+pu <- gasFore$a[,1] + qnorm(0.95, sd = sqrtR)
+x <- ts.union(window(lGas, start = c(1982, 1)),
+                + window(gasSmooth$s[,1], start = c(1982, 1)),
+                + gasFore$a[,1], pl, pu)
+plot(x, plot.type = "single", type = 'o', pch = c(1, 0, 20, 3, 3),
+       + col = c("darkgrey", "darkgrey", "brown", "yellow", "yellow"),
+       + ylab = "Log gas consumption")
+legend("bottomright", legend = c("Observed",
+                                   + "Smoothed (deseasonalized)",
+                                   + "Forecasted level", "90% probability limit"),
+         + bty = 'n', pch = c(1, 0, 20, 3, 3), lty = 1,
+         + col = c("darkgrey", "darkgrey", "brown", "yellow", "yellow"))
+
 
 
 
