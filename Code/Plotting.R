@@ -19,6 +19,7 @@ DATA <- DATA %>% filter(Count_Type != "max")       # filter out the cow max sinc
 ggplot(DATA, aes(Year, Count, line = Count_Type)) +
   geom_line(color = "blue") +
   geom_point(size = 0.1) +
+  scale_y_log10() + 
   theme_gray(base_size = 14) +
   facet_grid(Location ~ Age)
 
@@ -46,7 +47,7 @@ regressors <- cbind(TIME, SOI.YN) #put the two covariates into a file for model 
 #models comparing Poisson, nb, and nb with ENSO and differing autocorrelation lengths.
 cow_fit_nb.indep <- tsglm(CowDataTot, link = "log", distr = "nbinom",
                           xreg = regressors)
-cow_fit_poisson <- tsglm(CowDataTot, model = list(past_obs = c(1:2), past_mean = 3), link = "log", distr = "poisson",
+cow_fit_poisson <- tsglm(CowDataTot, model = list(past_obs = c(1,2), past_mean = 3), link = "log", distr = "poisson",
                          xreg = regressors)
 cow_fit_nb <- tsglm(CowDataTot, model = list(past_obs = c(1,2), past_mean = 3), link = "log", distr = "nbinom",
                          xreg = TIME)

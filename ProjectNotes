@@ -59,7 +59,12 @@ Next steps:
 
       
   
+ 2021-07-22
  
+ 1. try use state space model for cow prediction
+          dlm package pretty straightforward.
+          
+ 2. try to use MARRS or atsar to correct pup counts using cow estimates.
 
 
   
