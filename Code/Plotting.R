@@ -18,9 +18,9 @@ DATA <- DATA %>% filter(Count_Type != "max")       # filter out the cow max sinc
 
 ggplot(DATA, aes(Year, Count, line = Count_Type)) +
   geom_line(color = "blue") +
-  geom_point(size = 0.1) +
-  scale_y_log10() + 
-  theme_gray(base_size = 14) +
+  geom_point(size = 0.2) +
+  #scale_y_log10() + 
+  theme_gray(base_size = 16) +
   facet_grid(Location ~ Age)
 
 
@@ -78,7 +78,7 @@ AIC(cow_fit_nb.small)  #just first order autocorr = lowest AIC
 #plot(cow_fit_nb.small)
 par(ask=F) # reset graphics
 
-BESTMODEL <- cow_fit_nb.15
+BESTMODEL <- cow_fit_poisson
 
 # go with nb model for cow_fit_nb.soi 10 years into future
 pred1.pred <- predict(BESTMODEL, n.ahead = 10, level = 0.8, global = TRUE,  # 80% CI
@@ -163,6 +163,64 @@ legend("bottomright", legend = c("Observed",
                                    + "Forecasted level", "90% probability limit"),
          + bty = 'n', pch = c(1, 0, 20, 3, 3), lty = 1,
          + col = c("darkgrey", "darkgrey", "brown", "yellow", "yellow"))
+
+
+
+
+##----------------------------------
+## another method based on forecast package
+#install.packages(c("scoringRules", "forecast"))
+library(forecast)
+library(scoringRules)
+
+plot(CowDataTot, las = 1)
+Cow_train <- CowDataTot[1:40]
+Cow_test <- CowDataTot[31:40]  # try to have just 6 for the test
+
+acf(CowDataTot)
+
+train_aa_mod <- auto.arima(Cow_train)
+train_aa_mod
+
+train_ar1_mod <- arima(Cow_train, order = c(2, 0, 0))
+
+
+aa_forecast <- forecast(train_aa_mod, 10, level = c(50, 90))
+plot(aa_forecast, xlim = c(1,50), ylim = c(0, 4000), main = "Auto ARIMA", las = 1)
+lines(31:40, Cow_test)
+
+
+
+
+train_aa_mod$call$xreg <- forecast:::getxreg(train_aa_mod)
+
+test_xreg <- `colnames<-`(as.matrix(31:40), "drift")
+
+test_aa_forecast <- predict(object = train_aa_mod, n.ahead = 10,
+                            newxreg = test_xreg)
+test_aa_forecast <- data.frame(time = 31:40,
+                               pred = test_aa_forecast$pred,
+                               se = test_aa_forecast$se)
+aa_forecast_paths <- matrix(NA, nrow = 10, ncol = 1000)
+for(i in 1:1000){
+  aa_forecast_paths[,i] <- simulate(train_aa_mod, xreg = test_xreg,
+                                    bootstrap = TRUE, future = TRUE)
+}
+
+Cow_test_NA <- is.na(Cow_test)
+Cow_test_no_NAs <- Cow_test[!Cow_test_NA]
+aa_forecast_paths_no_NAs <- aa_forecast_paths[!Cow_test_NA, ]
+
+aa_crps <- -crps_sample(Cow_test_no_NAs, aa_forecast_paths_no_NAs)
+aa_logs <- -logs_sample(Cow_test_no_NAs, aa_forecast_paths_no_NAs)
+
+mean(aa_crps)
+mean(aa_logs)
+
+aa_PIT <- pnorm(Cow_test_no_NAs, mean = test_aa_forecast$pred,
+                sd = test_aa_forecast$se)
+
+hist(aa_PIT, breaks = seq(0, 1, 0.1), las = 1, main = "Auto ARIMA", xlab = "PIT")
 
 
 
