@@ -16,7 +16,7 @@ lambda_sd <- PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
 
 ## loop
 set.seed(2)
-N0 = 1597  #initial population size
+N0 = 1429  #initial population size
 times = 11  #number of years into the future
 N = vector(length = times)  #empty vector to store pop. sizes
 N[1] = N0  #initial population size should be the first N
@@ -39,7 +39,7 @@ set.seed(2)
 sims = 100
 outmat = sapply(1:sims, function(x) {
   times = 11
-  N0 = 1597
+  N0 = 1429
   N = vector(length = times)
   N[1] = N0
   LAMBDA = rnorm(times - 1, 1.064, 0.068)  # can try larger sd for more storm years
