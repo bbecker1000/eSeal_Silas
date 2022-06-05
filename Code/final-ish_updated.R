@@ -658,6 +658,7 @@ summary(gamm_cow$gam)
 gamm_pup <- gamm4(Count ~ s(Year), random=~(1|Location), data=tidypupNoT, family=poisson)
 plot(gamm_pup$gam)
 
+#removed random effects because it's calculated across all locations not by location (let me know if we need it by location)
 gamm_pupwnr <- gamm4(Count ~ s(Year), data=tidypupwnrNoT, family=poisson)
 plot(gamm_pupwnr$gam)
 #plots of all are similar.. gamm_pupwnr is a little different than the other two
