@@ -155,14 +155,14 @@ pu <- gasFore$a[,1] + qnorm(0.95, sd = sqrtR)
 x <- ts.union(window(lGas, start = c(1982, 1)),
                 + window(gasSmooth$s[,1], start = c(1982, 1)),
                 + gasFore$a[,1], pl, pu)
-plot(x, plot.type = "single", type = 'o', pch = c(1, 0, 20, 3, 3),
-       + col = c("darkgrey", "darkgrey", "brown", "yellow", "yellow"),
-       + ylab = "Log gas consumption")
-legend("bottomright", legend = c("Observed",
-                                   + "Smoothed (deseasonalized)",
-                                   + "Forecasted level", "90% probability limit"),
-         + bty = 'n', pch = c(1, 0, 20, 3, 3), lty = 1,
-         + col = c("darkgrey", "darkgrey", "brown", "yellow", "yellow"))
+#plot(x, plot.type = "single", type = 'o', pch = c(1, 0, 20, 3, 3),
+#         + col = c("darkgrey", "darkgrey", "brown", "yellow", "yellow"),
+#       + ylab = "Log gas consumption")
+#legend("bottomright", legend = c("Observed",
+#                                   + "Smoothed (deseasonalized)",
+#                                   + "Forecasted level", "90% probability limit"),
+#         + bty = 'n', pch = c(1, 0, 20, 3, 3), lty = 1,
+#         + col = c("darkgrey", "darkgrey", "brown", "yellow", "yellow"))
 
 
 

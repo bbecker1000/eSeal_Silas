@@ -9,9 +9,9 @@ library(gamm4)
 ## I recommend you keep your data in a "Data" subdirectory as we have in the github repo so we can use the same code. Rstudio sets your project
 ## directory as your working directory, then you can use relative paths and no need for "setwd".
 
-#setwd("~/Internship Summer 2021")
-#seals <- read_excel("Eseal_1981-2020.xlsx")
-seals <- read_excel("Data/Eseal_1981-2020.xlsx")
+setwd("~/Internship Summer 2021")
+seals <- read_excel("Eseal_1981-2020.xlsx")
+#seals <- read_excel("Data/Eseal_1981-2020.xlsx")
 # get rid of weird column
 seals <- subset(seals, select = -(...6))
 

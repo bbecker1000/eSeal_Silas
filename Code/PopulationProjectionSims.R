@@ -3,7 +3,7 @@
 ## let's do 10 years.
 ## use lambda since 2006
 ## need to make sure PlotData available from "final-ish.R
-
+PlotData <- tidyCows
 
 lambda_mean <- PlotData %>% filter(YEAR > 2005 & YEAR < 2021) %>%
   summarize(mean_lambda = mean(lambda))
