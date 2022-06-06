@@ -669,6 +669,7 @@ ga_cow <- gam(round(Count) ~ s(Year), family=poisson, data=tidyALLcowsest)
 plot(ga_cow)
 plot(fitted(ga_cow), resid(ga_cow))
 
+#next 2 plots look really different
 ga_pup <- gam(Count ~s(Year), family=poisson, data=tidyALLpup)
 plot(ga_pup)
 plot(fitted(ga_pup), resid(ga_pup))
