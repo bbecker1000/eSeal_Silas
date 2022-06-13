@@ -4,8 +4,8 @@ library(dplyr)
 library(lme4)
 library(gamm4)
 
-setwd("~/Internship Summer 2021")
-seals <- read_excel("Eseal_1981-2020.xlsx")
+#setwd("~/Internship Summer 2021")
+seals <- read_excel("Data/Eseal_1981-2020.xlsx")
 # get rid of weird column
 seals <- subset(seals, select = -(...6))
 
@@ -518,10 +518,28 @@ tidySeals <- rbind(tidyPups, tidyCows)
 ###POULATION TRENDS###
 ######################
 
+##Read in the MEI file
+mei <- read.table("Data/meiv2.data")
+#name columns that will be used
+mei <- mei %>% rename(
+    Year = V1,
+    DJ = V2,
+    JF = V3
+  )
+#select columns that will be used
+mei <- subset(mei, select = Year:JF)
+#get mean of DJ and JF
+mei$meanDJF <- rowMeans(mei[,c('DJ', 'JF')], na.rm=TRUE)
+#join with seal data
+tidySeals <- tidySeals %>% left_join(mei)
+tidyCows <- tidyCows %>% left_join(mei)
+tidyPups <- tidyPups %>% left_join(mei)
+
 ###################### 
 # Simple linear regression on log(counts) for cows/pups/wnrs at the three sites and as a whole. 
 ######################
 
+#subset the dataframes for models
 tidyPRcowsest <- subset(tidyCows, Location == "PR Headlands" & Count_Type == "estimate")
 tidyPRpup <- subset(tidyPups, Location == "PR Headlands" & Count_Type == "max")
 
@@ -540,21 +558,22 @@ LM_PR_cow <- lm(log(tidyPRcowsest$Count) ~ tidyPRcowsest$Year)
 summary(LM_PR_cow)
 plot(tidyPRcowsest$Year, log(tidyPRcowsest$Count), main="Log Estimated Cow Count from 1981 to 2020\nPR Headlands", xlab="Year", ylab='Log Count', pch=16)
 abline(LM_PR_cow, col="red")
-plot(LM_PR_cow)
+#plot.new()
+##plot(LM_PR_cow)
 
 #PR PUP
 LM_PR_pup <- lm(log(tidyPRpup$Count) ~ tidyPRpup$Year)
 summary(LM_PR_pup)
 plot(tidyPRpup$Year, log(tidyPRpup$Count), main="Log Maximum Pup Count from 1981 to 2020\nPR Headlands", xlab="Year", ylab='Log Count', pch=16)
 abline(LM_PR_pup, col="red")
-plot(LM_PR_pup)
+#plot(LM_PR_pup)
 
 #DB COW
 LM_DB_cow <- lm(log(tidyDBcowsest$Count) ~ tidyDBcowsest$Year)
 summary(LM_DB_cow)
 plot(tidyDBcowsest$Year, log(tidyDBcowsest$Count), main="Log Estimated Cow Count from 1995 to 2020\nDrakes Beach", xlab="Year", ylab='Log Count', pch=16)
 abline(LM_DB_cow, col="red")
-plot(LM_DB_cow)
+#plot(LM_DB_cow)
 # honestly this does a pretty ok job
 
 #DB PUP
@@ -562,7 +581,7 @@ LM_DB_pup <- lm(log(tidyDBpup$Count) ~ tidyDBpup$Year)
 summary(LM_DB_pup)
 plot(tidyDBpup$Year, log(tidyDBpup$Count), main="Log Maximum Pup Count from 1995 to 2020\nDrakes Beach", xlab="Year", ylab='Log Count', pch=16)
 abline(LM_DB_pup, col="red")
-plot(LM_DB_pup)
+#plot(LM_DB_pup)
 # honestly this does a pretty ok job
 
 #SB COW
@@ -570,7 +589,7 @@ LM_SB_cow <- lm(log(tidySBcowsest$Count) ~ tidySBcowsest$Year)
 summary(LM_SB_cow)
 plot(tidySBcowsest$Year, log(tidySBcowsest$Count), main="Log Estimated Cow Count from 1995 to 2020\nSouth Beach", xlab="Year", ylab='Log Count', pch=16)
 abline(LM_SB_cow, col="red")
-plot(LM_SB_cow)
+#plot(LM_SB_cow)
 # honestly this does a pretty ok job
 
 #SB PUP
@@ -578,7 +597,7 @@ LM_SB_pup <- lm(log(tidySBpup$Count) ~ tidySBpup$Year)
 summary(LM_SB_pup)
 plot(tidySBpup$Year, log(tidySBpup$Count), main="Log Maximum Pup Count from 1983 to 2020\nSouth Beach", xlab="Year", ylab='Log Count', pch=16)
 abline(LM_SB_pup, col="red")
-plot(LM_SB_pup)
+#plot(LM_SB_pup)
 # honestly this does a pretty ok job, but could do better by dropping the one odd count from 1983
 
 #SB PUP NO 1983
@@ -587,29 +606,29 @@ LM_SB_pupN <- lm(log(tidySBpupN$Count) ~ tidySBpupN$Year)
 summary(LM_SB_pupN)
 plot(tidySBpupN$Year, log(tidySBpupN$Count), main="Log Maximum Pup Count from 1995 to 2020\nSouth Beach", xlab="Year", ylab='Log Count', pch=16)
 abline(LM_SB_pupN, col="red")
-plot(LM_SB_pupN)
-# ok maybe I like the SB linear regressions less than I initially thought...
+#plot(LM_SB_pupN)
+# ehh just changes the intercept.. kind of the same as LM_SB_pup
 
 #ALL LOCATIONS COW
 LM_all_cow <- lm(log(tidyALLcowsest$Count) ~ tidyALLcowsest$Year)
 summary(LM_all_cow)
 plot(tidyALLcowsest$Year, log(tidyALLcowsest$Count), main="Log Estimated Cow Count from 1981 to 2020\nAll Locations", xlab="Year", ylab='Log Count', pch=16)
 abline(LM_all_cow, col="red")
-plot(LM_all_cow)
+#plot(LM_all_cow)
 
 #ALL LOCATIONS PUP
 LM_all_pup <- lm(log(tidyALLpup$Count) ~ tidyALLpup$Year)
 summary(LM_all_pup)
 plot(tidyALLpup$Year, log(tidyALLpup$Count), main="Log Maximum Pup Count from 1981 to 2020\nAll Locations", xlab="Year", ylab='Log Count', pch=16)
 abline(LM_all_pup, col="red")
-plot(LM_all_pup)
+#plot(LM_all_pup)
 
 #ALL LOCATIONS PUP AND WEANER
 LM_all_pupwnr <- lm(log(tidyALLpupwnr$Count) ~ tidyALLpupwnr$Year)
 summary(LM_all_pupwnr)
 plot(tidyALLpupwnr$Year, log(tidyALLpupwnr$Count), main="Log Maximum Pup and Weaner Count from 1981 to 2020\nAll Locations", xlab="Year", ylab='Log Count', pch=16)
 abline(LM_all_pupwnr, col="red")
-plot(LM_all_pupwnr)
+#plot(LM_all_pupwnr)
 
 
 ###################### Generalized Linear Mixed-model with counts poisson distributed
@@ -634,11 +653,13 @@ tidycowsNoT$rounded <- round(tidycowsNoT$Count) #need integer values
 glm_all_cow <- glm(round(tidyALLcowsest$Count) ~ tidyALLcowsest$Year, family = poisson) #wants integer values only so round the estimated counts
 plot(tidyALLcowsest$Year, log(tidyALLcowsest$Count), main="Log Estimated Cow Counts from 1981 to 2020\nAll Locations", xlab="Year", ylab='log count', pch=16)
 abline(glm_all_cow, col="blue")
+#does a good job from mid 1990s onward
 
 #ALL LOCATIONS PUP
 glm_all_pup <- glm(tidyALLpup$Count ~ tidyALLpup$Year, family = poisson)
 plot(tidyALLpup$Year, log(tidyALLpup$Count), main="Log Max Pup Counts from 1981 to 2020\nAll Locations", xlab="Year", ylab='log count', pch=16)
 abline(glm_all_pup, col="blue")
+#same as above, does a good job from mid 1990s onward
 
 #ALL LOCATIONS PUP AND WEANER
 glm_all_pupwnr <- glm(tidyALLpupwnr$Count ~ tidyALLpupwnr$Year, family = poisson)
@@ -648,37 +669,85 @@ abline(glm_all_pupwnr, col="blue")
 
 ###################### Generalized Additive Mixed model with counts poisson distributed
 #update 6/5 added family arg -> nonlinear plots..
+#https://drmowinckels.io/blog/2019-11-16-plotting-gamm-interactions-with-ggplot2/ plotting with ggplot (??)
+#https://gavinsimpson.github.io/gratia/reference/draw.gam.html also i can't figure out how to use this??
 
 tidypupNoT <- subset(tidyPups, Location != "All" & Age == "PUP")
 tidypupwnrNoT <- subset(tidyPups, Age == "PUP&WNR")
 
-gamm_cow <- gamm4(Count ~ s(Year), random=~(1|Location), data=tidycowsNoT, family=poisson)
+gamm_cow <- gamm4(rounded ~ s(Year), random=~(1|Location), data=tidycowsNoT, family=poisson)
 plot(gamm_cow$gam)
-summary(gamm_cow$gam) 
+##summary(gamm_cow$gam) 
 
 gamm_pup <- gamm4(Count ~ s(Year), random=~(1|Location), data=tidypupNoT, family=poisson)
 plot(gamm_pup$gam)
+##summary(gamm_pup)
 
 #removed random effects because it's calculated across all locations not by location (let me know if we need it by location)
 gamm_pupwnr <- gamm4(Count ~ s(Year), data=tidypupwnrNoT, family=poisson)
 plot(gamm_pupwnr$gam)
-#plots of all are similar.. gamm_pupwnr is a little different than the other two
+##summary(gamm_pup)
 
-#poisson residuals better
+#plots of all are similar.. gamm_pupwnr is a little different than the other two
 
 ga_cow <- gam(round(Count) ~ s(Year), family=poisson, data=tidyALLcowsest)
 plot(ga_cow)
 plot(fitted(ga_cow), resid(ga_cow))
+##AIC 430.4981
 
-#next 2 plots look really different
 ga_pup <- gam(Count ~s(Year), family=poisson, data=tidyALLpup)
 plot(ga_pup)
 plot(fitted(ga_pup), resid(ga_pup))
+##AIC 601.7505
 
 ga_pupwnr <- gam(Count ~s(Year), family=poisson, data=tidyALLpupwnr)
 plot(ga_pupwnr)
 plot(fitted(ga_pupwnr), resid(ga_pupwnr))
+##AIC 686.1113
 
+##################
+###MEI
+##################
+
+gamm_cow_mei <- gamm4(rounded ~ s(Year) + s(meanDJF), random=~(1|Location), data=tidycowsNoT, family=poisson)
+plot(gamm_cow_mei$gam)
+
+summary(gamm_cow_mei$gam) 
+
+gamm_pup_mei <- gamm4(Count ~ s(Year) + s(meanDJF), random=~(1|Location), data=tidypupNoT, family=poisson)
+plot(gamm_pup_mei$gam)
+##summary(gamm_pup_mei)
+
+#removed random effects because it's calculated across all locations not by location (let me know if we need it by location)
+gamm_pupwnr_mei <- gamm4(Count ~ s(Year) + s(meanDJF), data=tidypupwnrNoT, family=poisson)
+plot(gamm_pupwnr_mei$gam)
+##summary(gamm_pup_mei)
+
+
+
+ga_cow_mei <- gam(round(Count) ~ s(Year) + s(meanDJF), family=poisson, data=tidyALLcowsest)
+plot(ga_cow_mei)
+plot(fitted(ga_cow_mei), resid(ga_cow_mei))
+##AIC 410.1161
+
+ga_pup_mei <- gam(Count ~s(Year) + s(meanDJF), family=poisson, data=tidyALLpup)
+plot(ga_pup_mei)
+plot(fitted(ga_pup_mei), resid(ga_pup_mei)) #one outlier residual
+##AIC 507.4631
+
+ga_pupwnr_mei <- gam(Count ~s(Year) + s(meanDJF), family=poisson, data=tidyALLpupwnr)
+plot(ga_pupwnr_mei)
+plot(fitted(ga_pupwnr_mei), resid(ga_pupwnr_mei)) #one outlier residual, otherwise good and better than without mei
+##AIC 577.2867
+
+
+#################
+######NOTES######
+#################
+#try without and look into this if problematic
+#tensor product smooths > bivariate thin plate splines (how to choose??) especially for when using MEI
+#use t2(x, z) for gamm4(), can be used in gam() as well i think if not try te(x, z)
+#https://rdrr.io/cran/gamm4/man/gamm4.html
 
 
 #look into breakpoints -> two piecewise linear models https://cran.r-project.org/web/packages/segmented/segmented.pdf
