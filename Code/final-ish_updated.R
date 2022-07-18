@@ -3,6 +3,8 @@ library("readxl")
 library(dplyr)
 library(lme4)
 library(gamm4)
+library(ggrepel)
+library(gratia)
 
 #setwd("~/Internship Summer 2021")
 seals <- read_excel("Data/Eseal_1981-2020.xlsx")
