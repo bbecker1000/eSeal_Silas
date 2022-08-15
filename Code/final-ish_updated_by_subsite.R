@@ -378,312 +378,6 @@ p + facet_grid(rows = vars(site))
 npgo <- read.table("Data/npgo.txt", skip=1)
 names(npgo) <- c("year", "month", "index")
 
-##read in wave data
-wave <- data.frame(year=numeric(), Jmean=numeric(), Fmean=numeric(), Jmax=numeric(), Fmax=numeric())
-
-for (i in 83:98) {
-  file = paste("Data/",as.character(i),"wave.txt", sep="")
-  t <- read.table(file, TRUE)
-  t <- subset(t, WVHT != 99)
-  t1 <- subset(t, MM == 1)
-  t2 <- subset(t, MM == 2)
-  
-  #print(unique(t$WVHT))
-  #print(" ")
-  
-  if (length(t1$WVHT) != 0) {
-    t1mean <- mean(t1$WVHT)
-    t1max <- max(t1$WVHT)
-  } else {
-    t1mean <- NA
-    t1max <- NA
-  }
-  
-  if (length(t2$WVHT) != 0) {
-    t2mean <- mean(t2$WVHT)
-    t2max <- max(t2$WVHT)
-  } else {
-    t2mean <- NA
-    t2max <- -NA
-  }
-  
-  wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 1900 + i)
-  
-}
-
-
-file = "Data/99wave.txt"
-t <- read.table(file, TRUE)
-t <- subset(t, WVHT != 99)
-t1 <- subset(t, MM == 1)
-t2 <- subset(t, MM == 2)
-
-if (length(t1$WVHT) != 0) {
-  t1mean <- mean(t1$WVHT)
-  t1max <- max(t1$WVHT)
-} else {
-  t1mean <- NA
-  t1max <- NA
-}
-
-if (length(t2$WVHT) != 0) {
-  t2mean <- mean(t2$WVHT)
-  t2max <- max(t2$WVHT)
-} else {
-  t2mean <- NA
-  t2max <- -NA
-}
-
-wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 1999)
-
-
-for (i in 0:4) {
-  #07 starts new pattern
-  file = paste("Data/0",as.character(i),"wave.txt", sep="")
-  t <- read.table(file, TRUE, fill=TRUE)
-  t <- subset(t, WVHT != 99)
-  t1 <- subset(t, MM == 1)
-  t2 <- subset(t, MM == 2)
-  
-  if (length(t1$WVHT) != 0) {
-    t1mean <- mean(t1$WVHT)
-    t1max <- max(t1$WVHT)
-  } else {
-    t1mean <- NA
-    t1max <- NA
-  }
-  
-  if (length(t2$WVHT) != 0) {
-    t2mean <- mean(t2$WVHT)
-    t2max <- max(t2$WVHT)
-  } else {
-    t2mean <- NA
-    t2max <- -NA
-  }
-  
-  wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i)
-  
-
-}
-
-#06 has one more column than others
-wave3 <- read.table("Data/05wave.txt", TRUE)
-
-for (i in 5:9) {
-  file = paste("Data/0",as.character(i),"wave.txt", sep="")
-  t <- read.table(file, TRUE, fill=TRUE)
-  names(t) <- names(wave3)
-  
-  t <- subset(t, WVHT != 99)
-  t1 <- subset(t, MM == 1)
-  t2 <- subset(t, MM == 2)
-  
-  if (length(t1$WVHT) != 0) {
-    t1mean <- mean(t1$WVHT)
-    t1max <- max(t1$WVHT)
-  } else {
-    t1mean <- NA
-    t1max <- NA
-  }
-  
-  if (length(t2$WVHT) != 0) {
-    t2mean <- mean(t2$WVHT)
-    t2max <- max(t2$WVHT)
-  } else {
-    t2mean <- NA
-    t2max <- -NA
-  }
-  
-  wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i)
-  
-
-}
-
-for (i in 10:20) {
-  file = paste("Data/",as.character(i),"wave.txt", sep="")
-  t <- read.table(file, fill=TRUE)
-  names(t) <- names(wave3)
-  
-  t <- subset(t, WVHT != 99)
-  t1 <- subset(t, MM == 1)
-  t2 <- subset(t, MM == 2)
-  
-  if (length(t1$WVHT) != 0) {
-    t1mean <- mean(t1$WVHT)
-    t1max <- max(t1$WVHT)
-  } else {
-    t1mean <- NA
-    t1max <- NA
-  }
-  
-  if (length(t2$WVHT) != 0) {
-    t2mean <- mean(t2$WVHT)
-    t2max <- max(t2$WVHT)
-  } else {
-    t2mean <- NA
-    t2max <- -NA
-  }
-  
-  wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i)
-}
-
-###
-#only south wave data
-###
-waveSouth <- data.frame(year=numeric(), Jmean=numeric(), Fmean=numeric(), Jmax=numeric(), Fmax=numeric())
-
-for (i in 83:98) {
-  file = paste("Data/",as.character(i),"wave.txt", sep="")
-  t <- read.table(file, TRUE)
-  t <- subset(t, WVHT != 99)
-  t <- subset(t, WD >= 120)
-  t <- subset(t, WD <= 240)
-  t1 <- subset(t, MM == 1)
-  t2 <- subset(t, MM == 2)
-  
-  if (length(t1$WVHT) != 0) {
-    t1mean <- mean(t1$WVHT)
-    t1max <- max(t1$WVHT)
-  } else {
-    t1mean <- NA
-    t1max <- NA
-  }
-  
-  if (length(t2$WVHT) != 0) {
-    t2mean <- mean(t2$WVHT)
-    t2max <- max(t2$WVHT)
-  } else {
-    t2mean <- NA
-    t2max <- -NA
-  }
-  
-  waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 1900 + i)
-  
-}
-
-
-file = "Data/99wave.txt"
-t <- read.table(file, TRUE)
-t <- subset(t, WVHT != 99)
-t <- subset(t, WD >= 120)
-t <- subset(t, WD <= 240)
-t1 <- subset(t, MM == 1)
-t2 <- subset(t, MM == 2)
-
-if (length(t1$WVHT) != 0) {
-  t1mean <- mean(t1$WVHT)
-  t1max <- max(t1$WVHT)
-} else {
-  t1mean <- NA
-  t1max <- NA
-}
-
-if (length(t2$WVHT) != 0) {
-  t2mean <- mean(t2$WVHT)
-  t2max <- max(t2$WVHT)
-} else {
-  t2mean <- NA
-  t2max <- -NA
-}
-
-waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 1999)
-
-
-for (i in 0:4) {
-  #07 starts new pattern
-  file = paste("Data/0",as.character(i),"wave.txt", sep="")
-  t <- read.table(file, TRUE, fill=TRUE)
-  t <- subset(t, WVHT != 99)
-  t <- subset(t, WD >= 120)
-  t <- subset(t, WD <= 240)
-  t1 <- subset(t, MM == 1)
-  t2 <- subset(t, MM == 2)
-  
-  if (length(t1$WVHT) != 0) {
-    t1mean <- mean(t1$WVHT)
-    t1max <- max(t1$WVHT)
-  } else {
-    t1mean <- NA
-    t1max <- NA
-  }
-  
-  if (length(t2$WVHT) != 0) {
-    t2mean <- mean(t2$WVHT)
-    t2max <- max(t2$WVHT)
-  } else {
-    t2mean <- NA
-    t2max <- -NA
-  }
-  
-  waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i)
-  
-  
-}
-
-#06 has one more column than others
-wave3 <- read.table("Data/05wave.txt", TRUE)
-
-for (i in 5:9) {
-  file = paste("Data/0",as.character(i),"wave.txt", sep="")
-  t <- read.table(file, TRUE, fill=TRUE)
-  names(t) <- names(wave3)
-  
-  t <- subset(t, WVHT != 99)
-  t <- subset(t, WD >= 120)
-  t <- subset(t, WD <= 240)
-  t1 <- subset(t, MM == 1)
-  t2 <- subset(t, MM == 2)
-  
-  if (length(t1$WVHT) != 0) {
-    t1mean <- mean(t1$WVHT)
-    t1max <- max(t1$WVHT)
-  } else {
-    t1mean <- NA
-    t1max <- NA
-  }
-  
-  if (length(t2$WVHT) != 0) {
-    t2mean <- mean(t2$WVHT)
-    t2max <- max(t2$WVHT)
-  } else {
-    t2mean <- NA
-    t2max <- -NA
-  }
-  
-  waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i)
-  
-  
-}
-
-for (i in 10:20) {
-  file = paste("Data/",as.character(i),"wave.txt", sep="")
-  t <- read.table(file, fill=TRUE)
-  names(t) <- names(wave3)
-  
-  t <- subset(t, WVHT != 99)
-  t <- subset(t, WD >= 120)
-  t <- subset(t, WD <= 240)
-  t1 <- subset(t, MM == 1)
-  t2 <- subset(t, MM == 2)
-  
-  if (length(t1$WVHT) != 0) {
-    t1mean <- mean(t1$WVHT)
-    t1max <- max(t1$WVHT)
-  } else {
-    t1mean <- NA
-    t1max <- NA
-  }
-  
-  if (length(t2$WVHT) != 0) {
-    t2mean <- mean(t2$WVHT)
-    t2max <- max(t2$WVHT)
-  } else {
-    t2mean <- NA
-    t2max <- -NA
-  }
-  
-  waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i)
-}
 
 #read in tide data
 tide <- read.csv("Data/tideData.csv")
@@ -695,3 +389,56 @@ tide <- subset(tide, month == 1 | month == 2)
 
 tide <- tide[, c(12, 13, 3, 4)]
 names(tide)[names(tide) == "MHHW..ft."] <- "MHHW"
+
+
+t1 <- subset(tide, month == 1)
+t1 <- t1 %>% add_row(year=2009, month = 1)
+t2 <- subset(tide, month == 2)
+t1 <- t1[order(t1$year),]
+t2 <- t2[order(t2$year),]
+
+tideFinal <- data.frame(year=t1$year, Jhighest=t1$Highest, JMHHW=t1$MHHW, Fhighest=t2$Highest, FMHHW=t2$MHHW)
+
+##read in wave data
+wave <- read.csv("Data/waveData.csv")
+waveS <- read.csv("Data/waveDataSouth.csv")
+names(waveS) <- c("year", "JmeanS", "FmeanS", "JmaxS", "FmaxS")
+
+
+##modeling
+dat <- good_site_ratios2
+
+dat <- merge(x=dat,y=wave,by="year",all=TRUE)
+dat <- merge(x=dat,y=waveS,by="year",all=TRUE)
+dat <- merge(x=dat,y=tideFinal,by="year",all=TRUE)
+
+
+
+# glmer(cbind(pupend, pupinit) ~ Year + Site + (1|Site), family = binomial)
+mod1 <- lmer(ratio ~ year + (1|site), data = good_site_ratios2)
+plot(mod1)
+
+mod2 <- glmer(cbind(good_site_ratios2$survived, good_site_ratios2$born) ~ (1|good_site_ratios2$year), family = binomial)
+
+
+              
+mod3 <- glmer(cbind(good_site_ratios2$survived, good_site_ratios2$born) ~ (1|good_site_ratios2$year) +  good_site_ratios2$site , family = binomial)
+
+
+
+gr <- subset(good_site_ratios2, year > 1994)
+
+mod4 <- glmer(cbind(survived, born) ~ year + (1|year) + site + (1|site), family = binomial, data=gr)
+
+mod5 <- glmer(cbind(gr$survived, gr$born) ~ gr$year + gr$site + (1|gr$site), family = binomial)
+
+
+###
+PRr <- subset(good_site_ratios2, site == "PR Headlands")
+modPR <- glmer(cbind(PRr$survived, PRr$born) ~ (1|PRr$year), family = binomial)
+
+
+#sjplot plot_model
+
+
+
