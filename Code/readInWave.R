@@ -1,5 +1,5 @@
 ##read in wave data
-wave <- data.frame(year=numeric(), Jmean=numeric(), Fmean=numeric(), Jmax=numeric(), Fmax=numeric())
+wave <- data.frame(year=numeric(), Jmean=numeric(), Fmean=numeric(), Jmax=numeric(), Fmax=numeric(), Jewi=numeric(), Fewi=numeric())
 
 for (i in 83:98) {
   file = paste("Data/",as.character(i),"wave.txt", sep="")
@@ -14,20 +14,24 @@ for (i in 83:98) {
   if (length(t1$WVHT) != 0) {
     t1mean <- mean(t1$WVHT)
     t1max <- max(t1$WVHT)
+    t1ewi <-nrow(subset(t1, WVHT > 4))
   } else {
     t1mean <- NA
     t1max <- NA
+    t1ewi <- NA
   }
   
   if (length(t2$WVHT) != 0) {
     t2mean <- mean(t2$WVHT)
     t2max <- max(t2$WVHT)
+    t2ewi <-nrow(subset(t2, WVHT > 4))
   } else {
     t2mean <- NA
     t2max <- -NA
+    t2ewi <- NA
   }
   
-  wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 1900 + i)
+  wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 1900 + i, Jewi = t1ewi, Fewi = t2ewi)
   
 }
 
@@ -41,20 +45,24 @@ t2 <- subset(t, MM == 2)
 if (length(t1$WVHT) != 0) {
   t1mean <- mean(t1$WVHT)
   t1max <- max(t1$WVHT)
+  t1ewi <- nrow(subset(t1, WVHT > 4))
 } else {
   t1mean <- NA
   t1max <- NA
+  t1ewi <- NA
 }
 
 if (length(t2$WVHT) != 0) {
   t2mean <- mean(t2$WVHT)
   t2max <- max(t2$WVHT)
+  t2ewi <- nrow(subset(t2, WVHT > 4))
 } else {
   t2mean <- NA
   t2max <- -NA
+  t2ewi <- NA
 }
 
-wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 1999)
+wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 1999, Jewi = t1ewi, Fewi = t2ewi)
 
 
 for (i in 0:4) {
@@ -68,20 +76,24 @@ for (i in 0:4) {
   if (length(t1$WVHT) != 0) {
     t1mean <- mean(t1$WVHT)
     t1max <- max(t1$WVHT)
+    t1ewi <-nrow(subset(t1, WVHT > 4))
   } else {
     t1mean <- NA
     t1max <- NA
+    t1ewi <- NA
   }
   
   if (length(t2$WVHT) != 0) {
     t2mean <- mean(t2$WVHT)
     t2max <- max(t2$WVHT)
+    t2ewi <-nrow(subset(t2, WVHT > 4))
   } else {
     t2mean <- NA
-    t2max <- -NA
+    t2max <- NA
+    t2ewi <- NA
   }
   
-  wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i)
+  wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i, Jewi = t1ewi, Fewi = t2ewi)
   
   
 }
@@ -101,20 +113,24 @@ for (i in 5:9) {
   if (length(t1$WVHT) != 0) {
     t1mean <- mean(t1$WVHT)
     t1max <- max(t1$WVHT)
+    t1ewi <-nrow(subset(t1, WVHT > 4))
   } else {
     t1mean <- NA
     t1max <- NA
+    t1ewi <- NA
   }
   
   if (length(t2$WVHT) != 0) {
     t2mean <- mean(t2$WVHT)
     t2max <- max(t2$WVHT)
+    t2ewi <-nrow(subset(t2, WVHT > 4))
   } else {
     t2mean <- NA
     t2max <- -NA
+    t2ewi <- NA
   }
   
-  wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i)
+  wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i, Jewi = t1ewi, Fewi = t2ewi)
   
   
 }
@@ -131,26 +147,30 @@ for (i in 10:20) {
   if (length(t1$WVHT) != 0) {
     t1mean <- mean(t1$WVHT)
     t1max <- max(t1$WVHT)
+    t1ewi <-nrow(subset(t1, WVHT > 4))
   } else {
     t1mean <- NA
     t1max <- NA
+    t1ewi <- NA
   }
   
   if (length(t2$WVHT) != 0) {
     t2mean <- mean(t2$WVHT)
     t2max <- max(t2$WVHT)
+    t2ewi <-nrow(subset(t2, WVHT > 4))
   } else {
     t2mean <- NA
     t2max <- -NA
+    t2ewi <- NA
   }
   
-  wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i)
+  wave <- wave %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i, Jewi = t1ewi, Fewi = t2ewi)
 }
 
 ###
 #only south wave data
 ###
-waveSouth <- data.frame(year=numeric(), Jmean=numeric(), Fmean=numeric(), Jmax=numeric(), Fmax=numeric())
+waveSouth <- data.frame(year=numeric(), Jmean=numeric(), Fmean=numeric(), Jmax=numeric(), Fmax=numeric(), Jewi=numeric(), Fewi=numeric())
 
 for (i in 83:98) {
   file = paste("Data/",as.character(i),"wave.txt", sep="")
@@ -164,20 +184,24 @@ for (i in 83:98) {
   if (length(t1$WVHT) != 0) {
     t1mean <- mean(t1$WVHT)
     t1max <- max(t1$WVHT)
+    t1ewi <-nrow(subset(t1, WVHT > 4))
   } else {
     t1mean <- NA
     t1max <- NA
+    t1ewi <- NA
   }
   
   if (length(t2$WVHT) != 0) {
     t2mean <- mean(t2$WVHT)
     t2max <- max(t2$WVHT)
+    t2ewi <-nrow(subset(t2, WVHT > 4))
   } else {
     t2mean <- NA
     t2max <- -NA
+    t2ewi <- NA
   }
   
-  waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 1900 + i)
+  waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 1900 + i, Jewi=t1ewi, Fewi=t2ewi)
   
 }
 
@@ -193,20 +217,24 @@ t2 <- subset(t, MM == 2)
 if (length(t1$WVHT) != 0) {
   t1mean <- mean(t1$WVHT)
   t1max <- max(t1$WVHT)
+  t1ewi <-nrow(subset(t1, WVHT > 4))
 } else {
   t1mean <- NA
   t1max <- NA
+  t1ewi <- NA
 }
 
 if (length(t2$WVHT) != 0) {
   t2mean <- mean(t2$WVHT)
   t2max <- max(t2$WVHT)
+  t2ewi <-nrow(subset(t2, WVHT > 4))
 } else {
   t2mean <- NA
   t2max <- -NA
+  t2ewi <- NA
 }
 
-waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 1999)
+waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 1999, Jewi = t1ewi, Fewi = t2ewi)
 
 
 for (i in 0:4) {
@@ -222,20 +250,24 @@ for (i in 0:4) {
   if (length(t1$WVHT) != 0) {
     t1mean <- mean(t1$WVHT)
     t1max <- max(t1$WVHT)
+    t1ewi <-nrow(subset(t1, WVHT > 4))
   } else {
     t1mean <- NA
     t1max <- NA
+    t1ewi <- NA
   }
   
   if (length(t2$WVHT) != 0) {
     t2mean <- mean(t2$WVHT)
     t2max <- max(t2$WVHT)
+    t2ewi <-nrow(subset(t2, WVHT > 4))
   } else {
     t2mean <- NA
     t2max <- -NA
+    t2ewi <- NA
   }
   
-  waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i)
+  waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i, Jewi = t1ewi, Fewi = t2ewi)
   
   
 }
@@ -257,20 +289,24 @@ for (i in 5:9) {
   if (length(t1$WVHT) != 0) {
     t1mean <- mean(t1$WVHT)
     t1max <- max(t1$WVHT)
+    t1ewi <-nrow(subset(t1, WVHT > 4))
   } else {
     t1mean <- NA
     t1max <- NA
+    t1ewi <- NA
   }
   
   if (length(t2$WVHT) != 0) {
     t2mean <- mean(t2$WVHT)
     t2max <- max(t2$WVHT)
+    t2ewi <-nrow(subset(t2, WVHT > 4))
   } else {
     t2mean <- NA
     t2max <- -NA
+    t2ewi <- NA
   }
   
-  waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i)
+  waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i, Jewi = t1ewi, Fewi = t2ewi)
   
   
 }
@@ -289,20 +325,24 @@ for (i in 10:20) {
   if (length(t1$WVHT) != 0) {
     t1mean <- mean(t1$WVHT)
     t1max <- max(t1$WVHT)
+    t1ewi <-nrow(subset(t1, WVHT > 4))
   } else {
     t1mean <- NA
     t1max <- NA
+    t1ewi <- NA
   }
   
   if (length(t2$WVHT) != 0) {
     t2mean <- mean(t2$WVHT)
     t2max <- max(t2$WVHT)
+    t2ewi <-nrow(subset(t2, WVHT > 4))
   } else {
     t2mean <- NA
-    t2max <- -NA
+    t2max <- NA
+    t2ewi <- NA
   }
   
-  waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i)
+  waveSouth <- waveSouth %>% add_row(Jmean = t1mean, Fmean = t2mean, Jmax = t1max, Fmax = t2max, year = 2000 + i, Jewi =t1ewi, Fewi=t2ewi)
 }
 
 write.csv(wave, "Data/waveData.csv", row.names = FALSE)

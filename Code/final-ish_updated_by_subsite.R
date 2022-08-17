@@ -378,6 +378,53 @@ p + facet_grid(rows = vars(site))
 npgo <- read.table("Data/npgo.txt", skip=1)
 names(npgo) <- c("year", "month", "index")
 
+# (1) winter (i.e. December−February)
+# (2) fall: the 3 mo prior to female arrival in December (i.e. September−November)
+
+get_season2 <- function(month, year) {
+  season <- c()
+  for (i in 1:length(month)) {
+    if (month[i] > 6) {season <- c(season, year[i] + 1)}
+    else season <- c(season, year[i])
+  }
+  return(season)
+}
+
+seasons <- get_season2(npgo$month, npgo$year)
+
+npgo$season <- seasons
+
+
+year <- 1981:2020
+fall <- c()
+winter <- c()
+fall_winter <- c()
+for (y in 1981:2020) {
+  n <- subset(npgo, season == y)
+  nf <- subset(n, month == 9 | month == 10 | month == 11)
+  f <- mean(as.numeric(nf$index))
+  nw <- subset(n, month == 12| month == 1 | month == 2)
+  w <- mean(nw$index)
+  fw <- mean(c(nf$index, nw$index))
+  
+  fall <- c(fall, f)
+  winter <- c(winter, w)
+  fall_winter <- c(fall_winter, fw)
+}
+
+npgo <- data.frame(year=year, NPGOfall=fall, NPGOwinter=winter, NPGOfall_winter=fall_winter)
+
+## mei
+mei <- read.table("Data/meiv2.data", col.names=c("year", "DJ",	"JF",	"FM",	"MA",	"AM",	"MJ",	"JJ",	"JA",	"AS",	"SO",	"ON",	"ND"))
+meiFW <- mei[c("SO",	"ON",	"ND","DJ", "JF")]
+#not sure what to do with ND, can take out
+meiF <- mei[c("SO",	"ON",	"ND")]
+meiW <- mei[c("ND","DJ", "JF")]
+fw <- rowMeans(meiFW)
+f <- rowMeans(meiF)
+w <- rowMeans(meiW)
+mei <- data.frame(year=mei$year, MEIfall=f, MEIwinter=w, MEIfall_winter=fw)
+
 
 #read in tide data
 tide <- read.csv("Data/tideData.csv")
@@ -402,7 +449,8 @@ tideFinal <- data.frame(year=t1$year, Jhighest=t1$Highest, JMHHW=t1$MHHW, Fhighe
 ##read in wave data
 wave <- read.csv("Data/waveData.csv")
 waveS <- read.csv("Data/waveDataSouth.csv")
-names(waveS) <- c("year", "JmeanS", "FmeanS", "JmaxS", "FmaxS")
+#mean, max, ewi = extreme wave index
+names(waveS) <- c("year", "JmeanS", "FmeanS", "JmaxS", "FmaxS", "JewiS", "FewiS")
 
 
 ##modeling
@@ -411,7 +459,8 @@ dat <- good_site_ratios2
 dat <- merge(x=dat,y=wave,by="year",all=TRUE)
 dat <- merge(x=dat,y=waveS,by="year",all=TRUE)
 dat <- merge(x=dat,y=tideFinal,by="year",all=TRUE)
-
+dat <- merge(x=dat, y=npgo, by="year", all=TRUE)
+dat <- merge(x=dat, y=mei, by="year", all=TRUE)
 
 
 # glmer(cbind(pupend, pupinit) ~ Year + Site + (1|Site), family = binomial)
