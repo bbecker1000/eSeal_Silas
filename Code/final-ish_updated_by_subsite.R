@@ -7,7 +7,7 @@ library(ggrepel)
 library(gratia)
 library(tidyverse)
 
-seals <- read_excel("Data/Eseal_1981-2020_BySubsite.xlsx")
+seals <- read_excel("Data/Eseal_1981-2022_BySubsite.xlsx")
 names(seals)[names(seals) == "StartDate"] <- "Date"
 names(seals)[names(seals) == "SiteCode"] <- "Site"
 names(seals)[names(seals) == "SubSiteName"] <- "SubSite"

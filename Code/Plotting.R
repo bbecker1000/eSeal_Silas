@@ -4,7 +4,7 @@ library(tidyverse)
 library(plyr)
 library(cowplot)
 
-source("Code/final-ish.R")  ## get tidyfiles ready...check directory structure between ben and silas.
+source("Code/final-ish_updated.R")  ## get tidyfiles ready...check directory structure between ben and silas.
 
 head(tidySeals) #this has all the data but missing site level PUP&WNR
 unique(tidySeals$Count_Type) # ok, all the count types are here, but change max pup to "estimate" and remove estimate from cows
